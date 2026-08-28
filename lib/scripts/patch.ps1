@@ -2,12 +2,10 @@ param(
     [string]$platform = ""
 )
 
-git config --global user.name "ci"
-git config --global user.email "example@example.com"
-
-# TODO: remove
-# https://github.com/flutter/flutter/issues/182281
-$NewOverScrollIndicator = "362b1de29974ffc1ed6faa826e1df870d7bec75f";
+if ($env:CI -eq 'true') {
+    git config --global user.name "ci"
+    git config --global user.email "example@example.com"
+}
 
 # set `gestureSettings`
 $BottomSheetAndroidPatch = "lib/scripts/bottom_sheet_android.patch"
@@ -210,7 +208,13 @@ $patches_material = @($ModalBarrierPatchMaterial, $NavigationDrawerPatchMaterial
                     $FABPatchMaterial, $TextFieldPatchMaterial, $ScaffoldPatchMaterial, $RefreshIndicatorPatchMaterial,
                     $TabsPatchMaterial)
 
-$PubCacheDir = "~/.pub-cache"
+if ($env:PUB_CACHE) {
+    $PubCacheDir = $env:PUB_CACHE
+} elseif ($env:LOCALAPPDATA) {
+    $PubCacheDir = "$env:LOCALAPPDATA/Pub/Cache"
+} else {
+    $PubCacheDir = "~/.pub-cache"
+}
 
 switch ($platform.ToLower()) {
     "android" {
@@ -224,7 +228,6 @@ switch ($platform.ToLower()) {
     "macos" {
     }
     "windows" {
-        $PubCacheDir = "$env:LOCALAPPDATA/Pub/Cache"
     }
     default {}
 }
@@ -257,7 +260,7 @@ Get-ChildItem -Path "$env:GITHUB_WORKSPACE/lib/scripts/material" -Filter *.patch
         Set-Content -NoNewline $_.FullName
 }
 
-cd $MaterialUiDir.FullName
+Set-Location $MaterialUiDir.FullName
 
 foreach ($patch in $patches_material) {
     git apply "$env:GITHUB_WORKSPACE/$patch"
@@ -302,7 +305,7 @@ Get-ChildItem -Path "$env:GITHUB_WORKSPACE/lib/scripts/cupertino" -Filter *.patc
         Set-Content -NoNewline $_.FullName
 }
 
-cd $CupertinoUiDir.FullName
+Set-Location $CupertinoUiDir.FullName
 
 foreach ($patch in $patches_cupertino) {
     git apply "$env:GITHUB_WORKSPACE/$patch"
