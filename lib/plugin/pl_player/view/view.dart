@@ -32,6 +32,7 @@ import 'package:PiliPlus/pages/live_room/widgets/bottom_control.dart'
     as live_bottom;
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
+import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/post_panel/popup_menu_text.dart';
 import 'package:PiliPlus/pages/video/post_panel/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
@@ -397,7 +398,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     final isPart = videoDetail.pages != null && videoDetail.pages!.length > 1;
     final isPgc = !videoDetailController.isUgc;
     final isPlayAll = videoDetailController.isPlayAll;
-    final anySeason = isSeason || isPart || isPgc || isPlayAll;
+    final isNotVod = !videoDetailController.isVod;
+    final anySeason = isSeason || isPart || isPgc || isPlayAll || !isNotVod;
     final isFullScreen = this.isFullScreen;
     final double widgetWidth = isLandscape && isFullScreen ? 42 : 35;
 
@@ -560,6 +562,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           color: Colors.white,
         ),
         onTap: () {
+          if (videoDetailController.isVod) {
+            (introController as VodIntroController).showEpisodePanel();
+            return;
+          }
           if (videoDetailController.isFileSource) {
             // TODO
             return;
@@ -900,15 +906,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     final flag =
         isFullScreen || plPlayerController.isDesktopPip || maxWidth >= 500;
     final List<BottomControlType> userSpecifyItemRight = [
-      if (isNotFileSource && plPlayerController.showDmChart) .dmChart,
-      if (plPlayerController.isAnim) .superResolution,
-      if (isNotFileSource && plPlayerController.showViewPoints) .viewPoints,
+      if (isNotVod && isNotFileSource && plPlayerController.showDmChart)
+        .dmChart,
+      if (plPlayerController.enableSuperResolution) .superResolution,
+      if (isNotVod && isNotFileSource && plPlayerController.showViewPoints)
+        .viewPoints,
       if (isNotFileSource && anySeason) .episode,
       if (flag) .fit,
-      if (isNotFileSource) .aiTranslate,
-      .subtitle,
+      if (isNotVod && isNotFileSource) .aiTranslate,
+      if (isNotVod) .subtitle,
       .speed,
-      if (isNotFileSource && flag) .qa,
+      if (isNotVod && isNotFileSource && flag) .qa,
       if (!plPlayerController.isDesktopPip) .fullscreen,
     ];
     return PlayerBar(

@@ -321,6 +321,57 @@ abstract final class Pref {
   static String get systemProxyPort =>
       _setting.get(SettingBoxKey.systemProxyPort, defaultValue: '');
 
+  static String get vodConfigUrl =>
+      _setting.get(SettingBoxKey.vodConfigUrl, defaultValue: '');
+
+  static set setVodConfigUrl(String url) =>
+      _setting.put(SettingBoxKey.vodConfigUrl, url);
+
+  static List<String> get vodConfigUrls => List<String>.from(
+    _setting.get(SettingBoxKey.vodConfigUrls, defaultValue: <String>[]),
+  );
+
+  static set setVodConfigUrls(List<String> urls) =>
+      _setting.put(SettingBoxKey.vodConfigUrls, urls);
+
+  static String get vodUA =>
+      _setting.get(SettingBoxKey.vodUA, defaultValue: 'okhttp/3.15');
+
+  static set setVodUA(String ua) => _setting.put(SettingBoxKey.vodUA, ua);
+
+  static String get vodDefaultParse =>
+      _setting.get(SettingBoxKey.vodDefaultParse, defaultValue: '');
+
+  static set setVodDefaultParse(String name) =>
+      _setting.put(SettingBoxKey.vodDefaultParse, name);
+
+  static String get vodDefaultSite =>
+      _setting.get(SettingBoxKey.vodDefaultSite, defaultValue: '');
+
+  static set setVodDefaultSite(String key) =>
+      _setting.put(SettingBoxKey.vodDefaultSite, key);
+
+  static int get vodHomeRec =>
+      _setting.get(SettingBoxKey.vodHomeRec, defaultValue: 0);
+
+  static set setVodHomeRec(int value) =>
+      _setting.put(SettingBoxKey.vodHomeRec, value);
+
+  static List<String> get vodEnabledSites => List<String>.from(
+    _setting.get(SettingBoxKey.vodEnabledSites, defaultValue: <String>[]),
+  );
+
+  static set setVodEnabledSites(List<String> keys) =>
+      _setting.put(SettingBoxKey.vodEnabledSites, keys);
+
+  static bool get hasVodEnabledSites {
+    final value = _setting.get(SettingBoxKey.vodEnabledSites);
+    return value is List && value.isNotEmpty;
+  }
+
+  static Future<void> clearVodEnabledSites() =>
+      _setting.delete(SettingBoxKey.vodEnabledSites);
+
   static DynamicsTabType get defaultDynamicType =>
       DynamicsTabType.values[defaultDynamicTypeIndex];
 

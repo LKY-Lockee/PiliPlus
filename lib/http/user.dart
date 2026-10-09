@@ -5,7 +5,7 @@ import 'package:PiliPlus/models/user/info.dart';
 import 'package:PiliPlus/models/user/stat.dart';
 import 'package:PiliPlus/models_new/coin_log/data.dart';
 import 'package:PiliPlus/models_new/follow/data.dart';
-import 'package:PiliPlus/models_new/history/data.dart';
+import 'package:PiliPlus/models_new/history/history_bili/data.dart';
 import 'package:PiliPlus/models_new/later/data.dart';
 import 'package:PiliPlus/models_new/login_log/data.dart';
 import 'package:PiliPlus/models_new/media_list/data.dart';

@@ -1,9 +1,9 @@
-import 'package:PiliPlus/models_new/history/list.dart';
+import 'package:PiliPlus/models_new/history/history_bili/list.dart';
 import 'package:PiliPlus/models_new/history/tab.dart';
 
 class HistoryData {
   List<HistoryTab>? tab;
-  List<HistoryItemModel>? list;
+  List<HistoryBiliItemModel>? list;
 
   HistoryData({this.tab, this.list});
 
@@ -12,7 +12,7 @@ class HistoryData {
         ?.map((e) => HistoryTab.fromJson(e as Map<String, dynamic>))
         .toList(),
     list: (json['list'] as List<dynamic>?)
-        ?.map((e) => HistoryItemModel.fromJson(e as Map<String, dynamic>))
+        ?.map((e) => HistoryBiliItemModel.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 }

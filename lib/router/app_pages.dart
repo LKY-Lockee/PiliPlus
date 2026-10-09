@@ -58,6 +58,7 @@ import 'package:PiliPlus/pages/setting/pages/display_mode.dart';
 import 'package:PiliPlus/pages/setting/pages/font_setting.dart';
 import 'package:PiliPlus/pages/setting/pages/logs.dart';
 import 'package:PiliPlus/pages/setting/pages/play_speed_set.dart';
+import 'package:PiliPlus/pages/setting/pages/vod_source_manage.dart';
 import 'package:PiliPlus/pages/setting/view.dart';
 import 'package:PiliPlus/pages/settings_search/view.dart';
 import 'package:PiliPlus/pages/space_setting/view.dart';
@@ -65,6 +66,7 @@ import 'package:PiliPlus/pages/sponsor_block/view.dart';
 import 'package:PiliPlus/pages/subscription/view.dart';
 import 'package:PiliPlus/pages/subscription_detail/view.dart';
 import 'package:PiliPlus/pages/video/view.dart';
+import 'package:PiliPlus/pages/vod_sniffer/view.dart';
 import 'package:PiliPlus/pages/webview/view.dart';
 import 'package:PiliPlus/pages/whisper/view.dart';
 import 'package:PiliPlus/pages/whisper_detail/view.dart';
@@ -177,5 +179,10 @@ class Routes {
     GetPage(name: '/ssWeb', page: () => const MemberSSWeb()),
     GetPage(name: '/memberGuard', page: () => const MemberGuard()),
     GetPage(name: '/bubble', page: () => const BubblePage()),
+
+    // 点播嗅探
+    GetPage(name: '/vodSniffer', page: () => const VodSnifferPage()),
+    // 点播设置
+    GetPage(name: '/vodSourceManage', page: () => const VodSourceManagePage()),
   ];
 }

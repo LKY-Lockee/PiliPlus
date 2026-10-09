@@ -213,6 +213,14 @@ abstract final class SettingBoxKey {
   static const String systemProxyHost = 'systemProxyHost',
       systemProxyPort = 'systemProxyPort';
 
+  static const String vodConfigUrl = 'vodConfigUrl',
+      vodConfigUrls = 'vodConfigUrls',
+      vodUA = 'vodUA',
+      vodDefaultParse = 'vodDefaultParse',
+      vodDefaultSite = 'vodDefaultSite',
+      vodEnabledSites = 'vodEnabledSites',
+      vodHomeRec = 'vodHomeRec';
+
   static const String themeMode = 'themeMode',
       defaultTextScale = 'textScale',
       appFontWeight = 'appFontWeight',

@@ -4,6 +4,7 @@ import 'package:PiliPlus/pages/setting/models/play_settings.dart';
 import 'package:PiliPlus/pages/setting/models/privacy_settings.dart';
 import 'package:PiliPlus/pages/setting/models/recommend_settings.dart';
 import 'package:PiliPlus/pages/setting/models/style_settings.dart';
+import 'package:PiliPlus/pages/setting/models/third_party_settings.dart';
 import 'package:PiliPlus/pages/setting/models/video_settings.dart';
 
 enum SettingType {
@@ -12,6 +13,7 @@ enum SettingType {
   videoSetting('音视频设置'),
   playSetting('播放器设置'),
   styleSetting('外观设置'),
+  thirdPartySetting('第三方平台设置'),
   extraSetting('其它设置'),
   webdavSetting('WebDAV 设置'),
   about('关于'),
@@ -26,6 +28,7 @@ enum SettingType {
     .videoSetting => videoSettings,
     .playSetting => playSettings,
     .styleSetting => styleSettings,
+    .thirdPartySetting => thirdPartySettings,
     .extraSetting => extraSettings,
     _ => throw UnimplementedError(),
   };

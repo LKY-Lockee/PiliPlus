@@ -2,6 +2,7 @@ import 'package:PiliPlus/models/horizontal_video_model.dart';
 import 'package:PiliPlus/models/model_avatar.dart';
 import 'package:PiliPlus/models/model_owner.dart';
 import 'package:PiliPlus/models/model_video.dart';
+import 'package:PiliPlus/models_new/vod/video_data.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/em.dart';
 import 'package:PiliPlus/utils/extension/iterable_ext.dart';
@@ -448,4 +449,11 @@ class SearchArticleItemModel {
     templateId = json['templateId'];
     categoryName = json['category_name'];
   }
+}
+
+class SearchVodData extends SearchNumData<VodVideo> {
+  SearchVodData({
+    super.numResults,
+    super.list,
+  });
 }

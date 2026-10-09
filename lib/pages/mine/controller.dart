@@ -3,6 +3,7 @@ import 'package:PiliPlus/http/fav.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/user.dart';
 import 'package:PiliPlus/models/common/account_type.dart';
+import 'package:PiliPlus/models/common/fav_type.dart';
 import 'package:PiliPlus/models/common/theme/theme_type.dart';
 import 'package:PiliPlus/models/user/info.dart';
 import 'package:PiliPlus/models/user/stat.dart';
@@ -16,10 +17,10 @@ import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/theme_utils.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:material_ui/material_ui.dart';
 
 class MineController extends CommonDataController<FavFolderData, FavFolderData>
     with AccountMixin {
@@ -41,7 +42,7 @@ class MineController extends CommonDataController<FavFolderData, FavFolderData>
   static RxBool anonymity =
       (Accounts.account.isNotEmpty && !Accounts.heartbeat.isLogin).obs;
 
-  late final list = <({IconData icon, String title, VoidCallback onTap})>[
+  List<({IconData icon, String title, VoidCallback onTap})> get list => [
     (
       icon: CustomIcons.folderDownloadOutline,
       title: '离线缓存',
@@ -50,30 +51,28 @@ class MineController extends CommonDataController<FavFolderData, FavFolderData>
     (
       icon: CustomIcons.history,
       title: '观看记录',
-      onTap: () {
-        if (isLogin) {
-          Get.toNamed('/history');
-        }
-      },
+      onTap: () => Get.toNamed('/history'),
     ),
-    (
-      icon: CustomIcons.subscriptions_outlined,
-      title: '我的订阅',
-      onTap: () {
-        if (isLogin) {
-          Get.toNamed('/subscription');
-        }
-      },
-    ),
-    (
-      icon: CustomIcons.watch_later_outlined,
-      title: '稍后再看',
-      onTap: () {
-        if (isLogin) {
-          Get.toNamed('/later');
-        }
-      },
-    ),
+    if (isLogin) ...[
+      (
+        icon: CustomIcons.subscriptions_outlined,
+        title: '我的订阅',
+        onTap: () => Get.toNamed('/subscription'),
+      ),
+      (
+        icon: CustomIcons.watch_later_outlined,
+        title: '稍后再看',
+        onTap: () => Get.toNamed('/later'),
+      ),
+    ] else
+      (
+        icon: CustomIcons.star_favorite_line,
+        title: '我的收藏',
+        onTap: () => Get.toNamed(
+          '/fav',
+          arguments: FavTabType.vod.index,
+        ),
+      ),
   ];
 
   @override

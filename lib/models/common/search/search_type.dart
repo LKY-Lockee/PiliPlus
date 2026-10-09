@@ -19,6 +19,8 @@ enum SearchType {
   bili_user('用户'),
   // 专栏：article
   article('专栏'),
+  // 点播：tvbox
+  vod('点播'),
   ;
 
   // 相簿：photo

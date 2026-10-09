@@ -138,6 +138,7 @@ class PlPlayerController with BlockConfigMixin {
   int? _epid;
   int? _seasonId;
   int? _pgcType;
+  bool _isVod = false;
   VideoType _videoType = VideoType.ugc;
   int _heartDuration = 0;
   int? width;
@@ -601,6 +602,7 @@ class PlPlayerController with BlockConfigMixin {
     int? epid,
     int? seasonId,
     int? pgcType,
+    bool isVod = false,
     VideoType? videoType,
     VoidCallback? onInit,
     Volume? volume,
@@ -626,6 +628,7 @@ class PlPlayerController with BlockConfigMixin {
       _epid = epid;
       _seasonId = seasonId;
       _pgcType = pgcType;
+      _isVod = isVod;
 
       if (showSeekPreview) {
         _clearPreview();
@@ -686,14 +689,18 @@ class PlPlayerController with BlockConfigMixin {
   }
 
   late final isAnim = _pgcType == 1 || _pgcType == 4;
+  bool get enableSuperResolution => isAnim || _isVod;
   late final Rx<SuperResolutionType> superResolutionType =
-      (isAnim ? Pref.superResolutionType : SuperResolutionType.disable).obs;
+      (enableSuperResolution
+              ? Pref.superResolutionType
+              : SuperResolutionType.disable)
+          .obs;
   Future<void> setShader([SuperResolutionType? type, NativePlayer? pp]) async {
     if (type == null) {
       type = superResolutionType.value;
     } else {
       superResolutionType.value = type;
-      if (isAnim && !tempPlayerConf) {
+      if (enableSuperResolution && !tempPlayerConf) {
         setting.put(SettingBoxKey.superResolutionType, type.index);
       }
     }
@@ -792,7 +799,7 @@ class PlPlayerController with BlockConfigMixin {
         return;
       }
       _videoPlayerController = player;
-      if (isAnim && superResolutionType.value != .disable) {
+      if (enableSuperResolution && superResolutionType.value != .disable) {
         await setShader();
       }
     }
@@ -804,6 +811,9 @@ class PlPlayerController with BlockConfigMixin {
         ...liveBuffer
       else
         ...buffer,
+      if (dataSource.headers case final headers? when headers.isNotEmpty)
+        'http-header-fields':
+            '"${headers.entries.map((e) => '${e.key}: ${e.value}').join(',')}"',
     };
 
     String video = dataSource.videoSource;
@@ -1479,8 +1489,12 @@ class PlPlayerController with BlockConfigMixin {
     dynamic pgcType,
     VideoType? videoType,
   }) {
+    final effAid = aid ?? _aid;
+    final effCid = cid ?? this.cid;
     if (isLive ||
         !enableHeart ||
+        effAid == null ||
+        effCid == null ||
         progress == 0 ||
         (playerStatus.isPaused && !isManual)) {
       return null;
@@ -1488,9 +1502,9 @@ class PlPlayerController with BlockConfigMixin {
 
     Future<void> send() {
       return VideoHttp.heartBeat(
-        aid: aid ?? _aid,
+        aid: effAid,
         bvid: bvid ?? _bvid,
-        cid: cid ?? this.cid,
+        cid: effCid,
         progress: progress,
         epid: epid ?? _epid,
         seasonId: seasonId ?? _seasonId,
@@ -1641,6 +1655,9 @@ class PlPlayerController with BlockConfigMixin {
   late final previewIndex = RxnInt();
 
   void updatePreviewIndex(int seconds) {
+    if (_bvid == null || cid == null) {
+      return;
+    }
     if (videoShot == null) {
       videoShot = LoadingState.loading();
       getVideoShot();

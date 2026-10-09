@@ -225,8 +225,17 @@ abstract final class ImageUtils {
     r'(@(\d+[a-z]_?)*)(\..*)?$',
     caseSensitive: false,
   );
+
+  static final _biliImgHostRe = RegExp(
+    r'^https?://[^/]*(hdslb|biliimg)\.com',
+    caseSensitive: false,
+  );
+
   static String thumbnailUrl(String? src, [int maxQuality = 1]) {
-    if (src != null && maxQuality != 100) {
+    if (src == null || !_biliImgHostRe.hasMatch(src)) {
+      return src ?? '';
+    }
+    if (maxQuality != 100) {
       maxQuality = math.max(maxQuality, GlobalData().imgQuality);
       bool hasMatch = false;
       src = src.splitMapJoin(

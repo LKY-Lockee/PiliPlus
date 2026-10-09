@@ -115,8 +115,8 @@ abstract final class SearchHttp {
             case SearchType.article:
               data = SearchArticleData.fromJson(dataData);
               break;
-            // default:
-            //   break;
+            default:
+              break;
           }
           return Success(data);
         } catch (e, s) {

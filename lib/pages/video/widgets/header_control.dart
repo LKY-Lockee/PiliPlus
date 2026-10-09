@@ -34,6 +34,7 @@ import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/action_item.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/menu_row.dart';
+import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/widgets/header_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
@@ -359,7 +360,9 @@ class HeaderControlState extends State<HeaderControl>
   @override
   void initState() {
     super.initState();
-    if (isFileSource) {
+    if (isVod) {
+      introController = Get.find<VodIntroController>(tag: heroTag);
+    } else if (isFileSource) {
       introController = Get.find<LocalIntroController>(tag: heroTag);
     } else if (videoDetailCtr.isUgc) {
       introController = Get.find<UgcIntroController>(tag: heroTag);
@@ -382,38 +385,40 @@ class HeaderControlState extends State<HeaderControl>
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 14),
               children: [
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    Get.back();
-                    introController.viewLater();
-                  },
-                  leading: const Icon(Icons.watch_later_outlined, size: 20),
-                  title: const Text('添加至「稍后再看」', style: titleStyle),
-                ),
-                if (videoDetailCtr.epId == null)
+                if (!isVod) ...[
                   ListTile(
                     dense: true,
                     onTap: () {
                       Get.back();
-                      videoDetailCtr.showNoteList(context);
+                      introController.viewLater();
                     },
-                    leading: const Icon(Icons.note_alt_outlined, size: 20),
-                    title: const Text('查看笔记', style: titleStyle),
+                    leading: const Icon(Icons.watch_later_outlined, size: 20),
+                    title: const Text('添加至「稍后再看」', style: titleStyle),
                   ),
-                if (!isFileSource)
-                  ListTile(
-                    dense: true,
-                    onTap: () {
-                      Get.back();
-                      videoDetailCtr.onDownload(this.context);
-                    },
-                    leading: const Icon(
-                      MdiIcons.folderDownloadOutline,
-                      size: 20,
+                  if (videoDetailCtr.epId == null)
+                    ListTile(
+                      dense: true,
+                      onTap: () {
+                        Get.back();
+                        videoDetailCtr.showNoteList(context);
+                      },
+                      leading: const Icon(Icons.note_alt_outlined, size: 20),
+                      title: const Text('查看笔记', style: titleStyle),
                     ),
-                    title: const Text('离线缓存', style: titleStyle),
-                  ),
+                  if (!isFileSource)
+                    ListTile(
+                      dense: true,
+                      onTap: () {
+                        Get.back();
+                        videoDetailCtr.onDownload(this.context);
+                      },
+                      leading: const Icon(
+                        MdiIcons.folderDownloadOutline,
+                        size: 20,
+                      ),
+                      title: const Text('离线缓存', style: titleStyle),
+                    ),
+                ],
                 if (widget.videoDetailCtr.cover.value.isNotEmpty)
                   ListTile(
                     dense: true,
@@ -438,7 +443,7 @@ class HeaderControlState extends State<HeaderControl>
                   leading: const Icon(Icons.hourglass_top_outlined, size: 20),
                   title: const Text('定时关闭', style: titleStyle),
                 ),
-                if (!isFileSource) ...[
+                if (!isFileSource && !isVod)
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -451,6 +456,7 @@ class HeaderControlState extends State<HeaderControl>
                     ),
                     title: const Text('播放地址', style: titleStyle),
                   ),
+                if (!isFileSource)
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -460,7 +466,6 @@ class HeaderControlState extends State<HeaderControl>
                     leading: const Icon(Icons.refresh_outlined, size: 20),
                     title: const Text('重载视频', style: titleStyle),
                   ),
-                ],
                 PopupListTile<SuperResolutionType>(
                   dense: true,
                   leading: const Icon(
@@ -500,7 +505,7 @@ class HeaderControlState extends State<HeaderControl>
                         ),
                       ),
                     ),
-                if (!isFileSource)
+                if (!isFileSource && !isVod)
                   ListTile(
                     dense: true,
                     title: const Text('CDN 设置', style: titleStyle),
@@ -608,7 +613,7 @@ class HeaderControlState extends State<HeaderControl>
                     ],
                   ),
                 ),
-                if (!isFileSource) ...[
+                if (!isFileSource && !isVod) ...[
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -666,106 +671,108 @@ class HeaderControlState extends State<HeaderControl>
                   descPosType: .subtitle,
                   descFontSize: 12,
                 ),
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    Get.back();
-                    showDanmakuPool();
-                  },
-                  leading: const Icon(CustomIcons.dm_on, size: 20),
-                  title: const Text('弹幕列表', style: titleStyle),
-                ),
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    Get.back();
-                    showSetDanmaku();
-                  },
-                  leading: const Icon(CustomIcons.dm_settings, size: 20),
-                  title: const Text('弹幕设置', style: titleStyle),
-                ),
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    Get.back();
-                    showSetSubtitle();
-                  },
-                  leading: const Icon(Icons.subtitles_outlined, size: 20),
-                  title: const Text('字幕设置', style: titleStyle),
-                ),
-                ListTile(
-                  dense: true,
-                  onTap: () async {
-                    Get.back();
-                    try {
-                      final result = await FilePicker.pickFile(
-                        type: .custom,
-                        allowedExtensions: const [
-                          'json',
-                          'vtt',
-                          'srt',
-                          'ass',
-                          'bcc',
-                        ],
-                      );
-                      if (result != null) {
-                        final file = result.xFile;
-                        final path = file.path;
-                        final name = file.name;
-                        final length = videoDetailCtr.subtitles.length;
-                        if (name.endsWith('.json') || name.endsWith('.bcc')) {
-                          final file = File(path);
-                          final stream = file.openRead().transform(
-                            utf8.decoder,
-                          );
-                          final buffer = StringBuffer();
-                          await for (final chunk in stream) {
-                            if (!mounted) return;
-                            buffer.write(chunk);
-                          }
-                          if (!mounted) return;
-                          String sub = buffer.toString();
-                          sub = await compute<List, String>(
-                            SubtitleUtils.json2Vtt,
-                            jsonDecode(sub)['body'],
-                          );
-                          if (!mounted) return;
-                          videoDetailCtr.vttSubtitles[length] = (
-                            isData: true,
-                            id: sub,
-                          );
-                        } else {
-                          videoDetailCtr.vttSubtitles[length] = (
-                            isData: false,
-                            id: path,
-                          );
-                        }
-                        videoDetailCtr.subtitles.add(
-                          Subtitle(
-                            lan: '',
-                            lanDoc: name.split('.').firstOrNull ?? name,
-                          ),
-                        );
-                        await videoDetailCtr.setSubtitle(length + 1);
-                      }
-                    } catch (e) {
-                      SmartDialog.showToast('加载失败: $e');
-                    }
-                  },
-                  leading: const Icon(Icons.file_open_outlined, size: 20),
-                  title: const Text('加载字幕', style: titleStyle),
-                ),
-                if (!videoDetailCtr.isFileSource &&
-                    videoDetailCtr.subtitles.isNotEmpty)
+                if (!isVod) ...[
                   ListTile(
                     dense: true,
                     onTap: () {
                       Get.back();
-                      onExportSubtitle();
+                      showDanmakuPool();
                     },
-                    leading: const Icon(Icons.download_outlined, size: 20),
-                    title: const Text('保存字幕', style: titleStyle),
+                    leading: const Icon(CustomIcons.dm_on, size: 20),
+                    title: const Text('弹幕列表', style: titleStyle),
                   ),
+                  ListTile(
+                    dense: true,
+                    onTap: () {
+                      Get.back();
+                      showSetDanmaku();
+                    },
+                    leading: const Icon(CustomIcons.dm_settings, size: 20),
+                    title: const Text('弹幕设置', style: titleStyle),
+                  ),
+                  ListTile(
+                    dense: true,
+                    onTap: () {
+                      Get.back();
+                      showSetSubtitle();
+                    },
+                    leading: const Icon(Icons.subtitles_outlined, size: 20),
+                    title: const Text('字幕设置', style: titleStyle),
+                  ),
+                  ListTile(
+                    dense: true,
+                    onTap: () async {
+                      Get.back();
+                      try {
+                        final result = await FilePicker.pickFile(
+                          type: .custom,
+                          allowedExtensions: const [
+                            'json',
+                            'vtt',
+                            'srt',
+                            'ass',
+                            'bcc',
+                          ],
+                        );
+                        if (result != null) {
+                          final file = result.xFile;
+                          final path = file.path;
+                          final name = file.name;
+                          final length = videoDetailCtr.subtitles.length;
+                          if (name.endsWith('.json') || name.endsWith('.bcc')) {
+                            final file = File(path);
+                            final stream = file.openRead().transform(
+                              utf8.decoder,
+                            );
+                            final buffer = StringBuffer();
+                            await for (final chunk in stream) {
+                              if (!mounted) return;
+                              buffer.write(chunk);
+                            }
+                            if (!mounted) return;
+                            String sub = buffer.toString();
+                            sub = await compute<List, String>(
+                              SubtitleUtils.json2Vtt,
+                              jsonDecode(sub)['body'],
+                            );
+                            if (!mounted) return;
+                            videoDetailCtr.vttSubtitles[length] = (
+                              isData: true,
+                              id: sub,
+                            );
+                          } else {
+                            videoDetailCtr.vttSubtitles[length] = (
+                              isData: false,
+                              id: path,
+                            );
+                          }
+                          videoDetailCtr.subtitles.add(
+                            Subtitle(
+                              lan: '',
+                              lanDoc: name.split('.').firstOrNull ?? name,
+                            ),
+                          );
+                          await videoDetailCtr.setSubtitle(length + 1);
+                        }
+                      } catch (e) {
+                        SmartDialog.showToast('加载失败: $e');
+                      }
+                    },
+                    leading: const Icon(Icons.file_open_outlined, size: 20),
+                    title: const Text('加载字幕', style: titleStyle),
+                  ),
+                  if (!videoDetailCtr.isFileSource &&
+                      videoDetailCtr.subtitles.isNotEmpty)
+                    ListTile(
+                      dense: true,
+                      onTap: () {
+                        Get.back();
+                        onExportSubtitle();
+                      },
+                      leading: const Icon(Icons.download_outlined, size: 20),
+                      title: const Text('保存字幕', style: titleStyle),
+                    ),
+                ],
                 if (plPlayerController.videoPlayerController case final player?)
                   ListTile(
                     dense: true,
@@ -773,19 +780,20 @@ class HeaderControlState extends State<HeaderControl>
                     leading: const Icon(Icons.info_outline, size: 20),
                     onTap: () => showPlayerInfo(context, player: player),
                   ),
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    if (!Accounts.main.isLogin) {
-                      SmartDialog.showToast('账号未登录');
-                      return;
-                    }
-                    Get.back();
-                    PageUtils.reportVideo(videoDetailCtr.aid);
-                  },
-                  leading: const Icon(Icons.error_outline, size: 20),
-                  title: const Text('举报', style: titleStyle),
-                ),
+                if (!isVod)
+                  ListTile(
+                    dense: true,
+                    onTap: () {
+                      if (!Accounts.main.isLogin) {
+                        SmartDialog.showToast('账号未登录');
+                        return;
+                      }
+                      Get.back();
+                      PageUtils.reportVideo(videoDetailCtr.aid);
+                    },
+                    leading: const Icon(Icons.error_outline, size: 20),
+                    title: const Text('举报', style: titleStyle),
+                  ),
               ],
             ),
           ),
@@ -1660,6 +1668,7 @@ class HeaderControlState extends State<HeaderControl>
   }
 
   late final isFileSource = videoDetailCtr.isFileSource;
+  late final isVod = videoDetailCtr.isVod;
 
   @override
   Widget build(BuildContext context) {
@@ -1796,137 +1805,139 @@ class HeaderControlState extends State<HeaderControl>
                   ),
                 );
               }),
-            if (!isFileSource) ...[
-              if (!isFSOrPip) ...[
-                if (videoDetailCtr.isUgc)
+            if (!isVod) ...[
+              if (!isFileSource) ...[
+                if (!isFSOrPip) ...[
+                  if (videoDetailCtr.isUgc)
+                    SizedBox(
+                      width: btnWidth,
+                      height: btnHeight,
+                      child: IconButton(
+                        tooltip: '听音频',
+                        style: btnStyle,
+                        onPressed: videoDetailCtr.toAudioPage,
+                        icon: const Icon(
+                          Icons.headphones_outlined,
+                          size: 19,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   SizedBox(
                     width: btnWidth,
                     height: btnHeight,
                     child: IconButton(
-                      tooltip: '听音频',
+                      tooltip: '投屏',
                       style: btnStyle,
-                      onPressed: videoDetailCtr.toAudioPage,
+                      onPressed: videoDetailCtr.onCast,
                       icon: const Icon(
-                        Icons.headphones_outlined,
+                        Icons.cast,
                         size: 19,
                         color: Colors.white,
                       ),
                     ),
                   ),
+                ],
+                if (plPlayerController.enableSponsorBlock)
+                  SizedBox(
+                    width: btnWidth,
+                    height: btnHeight,
+                    child: IconButton(
+                      tooltip: '提交片段',
+                      style: btnStyle,
+                      onPressed: () => videoDetailCtr.onBlock(context),
+                      icon: const Icon(
+                        CustomIcons.shield_play_arrow,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                Obx(
+                  () => videoDetailCtr.segmentProgressList.isNotEmpty
+                      ? SizedBox(
+                          width: btnWidth,
+                          height: btnHeight,
+                          child: IconButton(
+                            tooltip: '片段信息',
+                            style: btnStyle,
+                            onPressed: videoDetailCtr.showSBDetail,
+                            icon: const Icon(
+                              MdiIcons.advertisements,
+                              size: 19,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                if (!isPortrait || isFullScreen || PlatformUtils.isDesktop) ...[
+                  SizedBox(
+                    width: btnWidth,
+                    height: btnHeight,
+                    child: IconButton(
+                      tooltip: '发弹幕',
+                      style: btnStyle,
+                      onPressed: videoDetailCtr.showShootDanmakuSheet,
+                      icon: const Icon(
+                        Icons.comment_outlined,
+                        size: 19,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: btnWidth,
+                    height: btnHeight,
+                    child: Obx(
+                      () {
+                        final enableShowDanmaku =
+                            plPlayerController.enableShowDanmaku.value;
+                        return IconButton(
+                          tooltip: "${enableShowDanmaku ? '关闭' : '开启'}弹幕",
+                          style: btnStyle,
+                          onPressed: () {
+                            final newVal = !enableShowDanmaku;
+                            plPlayerController.enableShowDanmaku.value = newVal;
+                            if (!plPlayerController.tempPlayerConf) {
+                              setting.put(
+                                SettingBoxKey.enableShowDanmaku,
+                                newVal,
+                              );
+                            }
+                          },
+                          icon: enableShowDanmaku
+                              ? const Icon(
+                                  size: 20,
+                                  CustomIcons.dm_on,
+                                  color: Colors.white,
+                                )
+                              : const Icon(
+                                  size: 20,
+                                  CustomIcons.dm_off,
+                                  color: Colors.white,
+                                ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
                 SizedBox(
                   width: btnWidth,
                   height: btnHeight,
                   child: IconButton(
-                    tooltip: '投屏',
+                    tooltip: '弹幕设置',
                     style: btnStyle,
-                    onPressed: videoDetailCtr.onCast,
+                    onPressed: showSetDanmaku,
                     icon: const Icon(
-                      Icons.cast,
-                      size: 19,
+                      size: 20,
+                      CustomIcons.dm_settings,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ],
-              if (plPlayerController.enableSponsorBlock)
-                SizedBox(
-                  width: btnWidth,
-                  height: btnHeight,
-                  child: IconButton(
-                    tooltip: '提交片段',
-                    style: btnStyle,
-                    onPressed: () => videoDetailCtr.onBlock(context),
-                    icon: const Icon(
-                      CustomIcons.shield_play_arrow,
-                      size: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              Obx(
-                () => videoDetailCtr.segmentProgressList.isNotEmpty
-                    ? SizedBox(
-                        width: btnWidth,
-                        height: btnHeight,
-                        child: IconButton(
-                          tooltip: '片段信息',
-                          style: btnStyle,
-                          onPressed: videoDetailCtr.showSBDetail,
-                          icon: const Icon(
-                            MdiIcons.advertisements,
-                            size: 19,
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
             ],
-            if (!isPortrait || isFullScreen || PlatformUtils.isDesktop) ...[
-              SizedBox(
-                width: btnWidth,
-                height: btnHeight,
-                child: IconButton(
-                  tooltip: '发弹幕',
-                  style: btnStyle,
-                  onPressed: videoDetailCtr.showShootDanmakuSheet,
-                  icon: const Icon(
-                    Icons.comment_outlined,
-                    size: 19,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: btnWidth,
-                height: btnHeight,
-                child: Obx(
-                  () {
-                    final enableShowDanmaku =
-                        plPlayerController.enableShowDanmaku.value;
-                    return IconButton(
-                      tooltip: "${enableShowDanmaku ? '关闭' : '开启'}弹幕",
-                      style: btnStyle,
-                      onPressed: () {
-                        final newVal = !enableShowDanmaku;
-                        plPlayerController.enableShowDanmaku.value = newVal;
-                        if (!plPlayerController.tempPlayerConf) {
-                          setting.put(
-                            SettingBoxKey.enableShowDanmaku,
-                            newVal,
-                          );
-                        }
-                      },
-                      icon: enableShowDanmaku
-                          ? const Icon(
-                              size: 20,
-                              CustomIcons.dm_on,
-                              color: Colors.white,
-                            )
-                          : const Icon(
-                              size: 20,
-                              CustomIcons.dm_off,
-                              color: Colors.white,
-                            ),
-                    );
-                  },
-                ),
-              ),
-            ],
-            SizedBox(
-              width: btnWidth,
-              height: btnHeight,
-              child: IconButton(
-                tooltip: '弹幕设置',
-                style: btnStyle,
-                onPressed: showSetDanmaku,
-                icon: const Icon(
-                  size: 20,
-                  CustomIcons.dm_settings,
-                  color: Colors.white,
-                ),
-              ),
-            ),
             if (Platform.isAndroid ||
                 (PlatformUtils.isDesktop && !isFullScreen))
               SizedBox(

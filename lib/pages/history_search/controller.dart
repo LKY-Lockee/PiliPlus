@@ -1,8 +1,8 @@
 import 'package:PiliPlus/common/widgets/dialog/dialog.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/user.dart';
-import 'package:PiliPlus/models_new/history/data.dart';
-import 'package:PiliPlus/models_new/history/list.dart';
+import 'package:PiliPlus/models_new/history/history_bili/data.dart';
+import 'package:PiliPlus/models_new/history/history_bili/list.dart';
 import 'package:PiliPlus/pages/common/multi_select/base.dart';
 import 'package:PiliPlus/pages/common/search/common_search_controller.dart';
 import 'package:PiliPlus/utils/accounts.dart';
@@ -11,8 +11,8 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class HistorySearchController
-    extends CommonSearchController<HistoryData, HistoryItemModel>
-    with CommonMultiSelectMixin<HistoryItemModel>, DeleteItemMixin {
+    extends CommonSearchController<HistoryData, HistoryBiliItemModel>
+    with CommonMultiSelectMixin<HistoryBiliItemModel>, DeleteItemMixin {
   @override
   Future<LoadingState<HistoryData>> customGetData() => UserHttp.searchHistory(
     pn: page,
@@ -21,7 +21,7 @@ class HistorySearchController
   );
 
   @override
-  List<HistoryItemModel>? getDataList(HistoryData response) {
+  List<HistoryBiliItemModel>? getDataList(HistoryData response) {
     return response.list;
   }
 

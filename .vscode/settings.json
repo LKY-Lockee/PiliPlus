@@ -4,7 +4,9 @@
         "editor.formatOnType": true
     },
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit",
+        "source.organizeImports": "explicit"
         // "source.fixAll": "explicit",
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "disabled",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

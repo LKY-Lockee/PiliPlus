@@ -42,6 +42,7 @@ import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/pages/video/download_panel/view.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
+import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/medialist/view.dart';
 import 'package:PiliPlus/pages/video/note/view.dart';
 import 'package:PiliPlus/pages/video/post_panel/view.dart';
@@ -102,6 +103,7 @@ class VideoDetailController extends GetxController
   late SourceType sourceType;
   late BiliDownloadEntryInfo entry;
   late bool isFileSource;
+  late bool isVod;
   late bool _mediaDesc = false;
   late final RxList<MediaListItemModel> mediaList = <MediaListItemModel>[].obs;
   late String watchLaterTitle;
@@ -131,6 +133,7 @@ class VideoDetailController extends GetxController
   double get uiScale => plPlayerController.uiScale;
 
   late VideoItem firstVideo;
+  Map<String, String> playHeaders = const {};
   String? videoUrl;
   String? audioUrl;
   Duration? defaultST;
@@ -150,14 +153,14 @@ class VideoDetailController extends GetxController
   // 预设的解码格式
   late List<VideoDecodeFormatType> preferCodecs = Pref.preferCodecs;
 
-  bool get showReply => isFileSource
+  bool get showReply => isFileSource || isVod
       ? false
       : isUgc
       ? plPlayerController.showVideoReply
       : plPlayerController.showBangumiReply;
 
   bool get showRelatedVideo =>
-      isFileSource ? false : plPlayerController.showRelatedVideo;
+      isFileSource || isVod ? false : plPlayerController.showRelatedVideo;
 
   ScrollController? introScrollCtr;
   ScrollController get effectiveIntroScrollCtr =>
@@ -374,7 +377,8 @@ class VideoDetailController extends GetxController
 
     sourceType = args['sourceType'] ?? SourceType.normal;
     isFileSource = sourceType == SourceType.file;
-    isPlayAll = sourceType != SourceType.normal && !isFileSource;
+    isVod = sourceType == SourceType.vod;
+    isPlayAll = sourceType != SourceType.normal && !isFileSource && !isVod;
     if (isFileSource) {
       initFileSource(args['entry']);
     } else if (isPlayAll) {
@@ -722,7 +726,9 @@ class VideoDetailController extends GetxController
     if (seek == .zero) seek = null;
     seek ??= getFirstSegment();
     await plPlayerController.setDataSource(
-      isFileSource
+      isVod
+          ? NetworkSource(videoSource: videoUrl!, headers: playHeaders)
+          : isFileSource
           ? FileSource(
               dir: args['dirPath'],
               typeTag: entry.typeTag!,
@@ -734,13 +740,15 @@ class VideoDetailController extends GetxController
               audioSource: audioUrl,
             ),
       seekTo: seek,
-      duration: data.timeLength == null
+      duration: isVod
+          ? null
+          : data.timeLength == null
           ? null
           : Duration(milliseconds: data.timeLength!),
       isVertical: isVertical.value,
-      aid: aid,
-      bvid: bvid,
-      cid: cid.value,
+      aid: isVod ? null : aid,
+      bvid: isVod ? null : bvid,
+      cid: isVod ? null : cid.value,
       autoplay: autoplay ?? _autoPlay.value,
       epid: isUgc ? null : epId,
       seasonId: isUgc ? null : seasonId,
@@ -750,8 +758,8 @@ class VideoDetailController extends GetxController
         videoState.value = true;
         setSubtitle(vttSubtitlesIndex.value);
       },
-      width: firstVideo.width,
-      height: firstVideo.height,
+      width: isVod ? null : firstVideo.width,
+      height: isVod ? null : firstVideo.height,
       volume: volume,
       autoFullScreenFlag: autoFullScreenFlag,
     );
@@ -799,6 +807,9 @@ class VideoDetailController extends GetxController
   }) async {
     if (isFileSource) {
       return _initPlayerIfNeeded(autoFullScreenFlag);
+    }
+    if (isVod) {
+      return _queryVodVideoUrl(autoFullScreenFlag: autoFullScreenFlag);
     }
     if (isQuerying) {
       return;
@@ -980,6 +991,40 @@ class VideoDetailController extends GetxController
         plPlayerController.triggerFullScreen(status: false);
       }
       result.toast();
+    }
+    isQuerying = false;
+  }
+
+  Future<void> _queryVodVideoUrl({bool autoFullScreenFlag = false}) async {
+    if (isQuerying) {
+      return;
+    }
+    final intro = Get.find<VodIntroController>(tag: heroTag);
+    isQuerying = true;
+    try {
+      await intro.loadDetail();
+      if (isClosed) {
+        isQuerying = false;
+        return;
+      }
+      if (intro.playFlags.isEmpty) {
+        autoPlay = false;
+        videoState.value = false;
+        isQuerying = false;
+        return;
+      }
+      if (intro.episodeIndex.value < 0) {
+        intro.episodeIndex.value = 0;
+      }
+      await intro.playEpisode(
+        intro.flagIndex.value,
+        intro.episodeIndex.value,
+        autoFullScreenFlag: autoFullScreenFlag,
+      );
+    } catch (e) {
+      autoPlay = false;
+      videoState.value = false;
+      SmartDialog.showToast('点播播放失败：$e');
     }
     isQuerying = false;
   }
@@ -1209,6 +1254,10 @@ class VideoDetailController extends GetxController
   }
 
   void makeHeartBeat() {
+    if (isVod) {
+      Get.find<VodIntroController>(tag: heroTag).saveRecord();
+      return;
+    }
     if (plPlayerController.enableHeart &&
         !plPlayerController.playerStatus.isCompleted &&
         playedTime != null) {

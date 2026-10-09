@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:PiliPlus/common/assets.dart';
+import 'package:PiliPlus/common/widgets/marquee.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_info_model/episode.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_info_model/new_ep.dart';
 import 'package:PiliPlus/models_new/video/video_detail/episode.dart'
@@ -232,14 +233,13 @@ class _PgcPanelState extends State<PgcPanel> {
                   ],
                 ),
                 if (hasLongTitle)
-                  Text(
+                  MarqueeText(
                     isPugv ? item.title! : item.longTitle!,
-                    maxLines: 1,
+                    spacing: 16,
                     style: TextStyle(
                       fontSize: 13,
                       color: color,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
               ],
             ),

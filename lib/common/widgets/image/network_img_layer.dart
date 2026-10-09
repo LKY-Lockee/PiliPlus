@@ -22,6 +22,7 @@ class NetworkImgLayer extends StatelessWidget {
     this.fit = .cover,
     this.alignment = .center,
     this.cacheWidth,
+    this.httpHeaders,
   });
 
   final String? src;
@@ -36,6 +37,7 @@ class NetworkImgLayer extends StatelessWidget {
   final BoxFit fit;
   final Alignment alignment;
   final bool? cacheWidth;
+  final Map<String, String>? httpHeaders;
 
   static Color? reduceLuxColor = Pref.reduceLuxColor;
   static bool reduce = false;
@@ -78,6 +80,7 @@ class NetworkImgLayer extends StatelessWidget {
       memCacheHeight: memCacheHeight,
       fit: fit,
       alignment: alignment,
+      httpHeaders: httpHeaders,
       fadeOutDuration: fadeOutDuration,
       fadeInDuration: fadeInDuration,
       filterQuality: FilterQuality.low,

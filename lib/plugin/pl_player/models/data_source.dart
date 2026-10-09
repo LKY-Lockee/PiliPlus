@@ -4,17 +4,20 @@ import 'package:path/path.dart' as path;
 sealed class DataSource {
   final String videoSource;
   final String? audioSource;
+  final Map<String, String>? headers;
 
   DataSource({
     required this.videoSource,
     required this.audioSource,
+    this.headers,
   });
 }
 
 class NetworkSource extends DataSource {
   NetworkSource({
     required super.videoSource,
-    required super.audioSource,
+    super.audioSource,
+    super.headers,
   });
 }
 

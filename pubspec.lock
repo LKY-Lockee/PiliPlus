@@ -712,6 +712,14 @@ packages:
       url: "https://github.com/bggRGjQaUbCoE/flutter_inappwebview.git"
     source: git
     version: "0.6.0"
+  flutter_js:
+    dependency: "direct main"
+    description:
+      name: flutter_js
+      sha256: "046428059ac7bef71e305dc35fc24be933b684684a43e83eab7ebd0dc407ad85"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.7"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -741,6 +749,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.8"
+  flutter_opencc_plus:
+    dependency: "direct main"
+    description:
+      name: flutter_opencc_plus
+      sha256: f9ff2d1fa6eab1a458e3fb9d6f5e4c4e9c17970e86e5198432cf751a4d4901f9
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -802,6 +818,14 @@ packages:
       url: "https://github.com/bggRGjQaUbCoE/font_awesome_flutter.git"
     source: git
     version: "10.9.0"
+  gbk_codec:
+    dependency: "direct main"
+    description:
+      name: gbk_codec
+      sha256: "3af5311fc9393115e3650ae6023862adf998051a804a08fb804f042724999f61"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   get:
     dependency: "direct main"
     description:
@@ -1437,7 +1461,7 @@ packages:
     source: hosted
     version: "2.1.8"
   pointycastle:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: pointycastle
       sha256: "4be0097fcf3fd3e8449e53730c631200ebc7b88016acecab2b0da2f0149222fe"
@@ -1746,6 +1770,14 @@ packages:
       url: "https://github.com/bggRGjQaUbCoE/super_sliver_list.git"
     source: git
     version: "0.4.1"
+  sync_http:
+    dependency: transitive
+    description:
+      name: sync_http
+      sha256: "7f0cd72eca000d2e026bcd6f990b81d0ca06022ef4e32fb257b30d3d1014a961"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   synchronized:
     dependency: "direct main"
     description:
@@ -2021,7 +2053,7 @@ packages:
     source: hosted
     version: "1.1.0"
   xml:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: xml
       sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"

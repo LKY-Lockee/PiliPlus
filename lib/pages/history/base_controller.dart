@@ -1,21 +1,38 @@
+import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/user.dart';
 import 'package:PiliPlus/utils/accounts.dart';
+import 'package:PiliPlus/utils/accounts/account.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart';
 
 class HistoryBaseController extends GetxController {
-  RxBool pauseStatus = false.obs;
+  RxBool pauseStatus = Pref.historyPause.obs;
 
   RxBool enableMultiSelect = false.obs;
   RxInt checkedCount = 0.obs;
 
   final account = Accounts.history;
 
+  Future<void> historyStatus() async {
+    final res = await UserHttp.historyStatus(account: account);
+    if (res case Success(:final response)) {
+      pauseStatus.value = response;
+      GStorage.localCache.put(LocalCacheKey.historyPause, response);
+    } else {
+      res.toast();
+    }
+  }
+
   // 清空观看历史
-  void onClearHistory(BuildContext context, VoidCallback onSuccess) {
+  void onClearHistory(
+    BuildContext context,
+    Future<LoadingState<void>> Function(Account account) onClear,
+    VoidCallback onSuccess,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -33,7 +50,7 @@ class HistoryBaseController extends GetxController {
             onPressed: () async {
               Get.back();
               SmartDialog.showLoading(msg: '请求中');
-              final res = await UserHttp.clearHistory(account: account);
+              final res = await onClear(account);
               SmartDialog.dismiss();
               if (res.isSuccess) {
                 SmartDialog.showToast('清空观看历史');
@@ -68,10 +85,12 @@ class HistoryBaseController extends GetxController {
           TextButton(
             onPressed: () async {
               SmartDialog.showLoading(msg: '请求中');
-              final res = await UserHttp.pauseHistory(
-                pauseStatus,
-                account: account,
-              );
+              final res = account.isLogin
+                  ? await UserHttp.pauseHistory(
+                      pauseStatus,
+                      account: account,
+                    )
+                  : const Success<void>(null);
               SmartDialog.dismiss();
               if (res.isSuccess) {
                 SmartDialog.showToast(pauseStatus ? '暂停观看历史' : '恢复观看历史');

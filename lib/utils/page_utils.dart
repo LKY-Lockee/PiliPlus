@@ -8,7 +8,8 @@ import 'package:PiliPlus/http/dynamics.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/search.dart';
 import 'package:PiliPlus/http/video.dart';
-import 'package:PiliPlus/models/common/image_preview_type.dart';
+import 'package:PiliPlus/models/common/image_preview_type.dart' hide SourceType;
+import 'package:PiliPlus/models/common/video/source_type.dart';
 import 'package:PiliPlus/models/common/video/video_type.dart';
 import 'package:PiliPlus/models/dynamics/result.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_info_model/episode.dart';
@@ -558,6 +559,29 @@ abstract final class PageUtils {
     };
     return PageUtils.toDupNamed('/videoV', arguments: arguments, off: off);
   }
+
+  static Future<void>? toVodPage({
+    required String sourceKey,
+    required String vodId,
+    String? title,
+    String? cover,
+    bool off = false,
+  }) => toDupNamed(
+    '/videoV',
+    arguments: {
+      'aid': 0,
+      'bvid': 'vod_$sourceKey',
+      'cid': 0,
+      'videoType': VideoType.ugc,
+      'sourceType': SourceType.vod,
+      'sourceKey': sourceKey,
+      'vodId': vodId,
+      'title': ?title,
+      'cover': ?cover,
+      'heroTag': Utils.makeHeroTag(vodId),
+    },
+    off: off,
+  );
 
   static final _pgcRegex = RegExp(r'(ep|ss)(\d+)');
   static bool viewPgcFromUri(

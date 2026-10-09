@@ -85,7 +85,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
                     _buildUserInfo(theme, secondary),
-                    _buildActions(secondary),
+                    Obx(() => _buildActions(secondary)),
                     Obx(
                       () => controller.loadingState.value is Loading
                           ? const SizedBox.shrink()
@@ -372,32 +372,34 @@ class _MediaPageState extends CommonPageState<MinePage>
             ),
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: .spaceEvenly,
-            children: [
-              _btn(
-                count: userStat.dynamicCount,
-                countStyle: style,
-                name: '动态',
-                labelStyle: labelStyle,
-                onTap: () => controller.push('memberDynamics'),
-              ),
-              _btn(
-                count: userStat.following,
-                countStyle: style,
-                name: '关注',
-                labelStyle: labelStyle,
-                onTap: () => controller.push('follow'),
-              ),
-              _btn(
-                count: userStat.follower,
-                countStyle: style,
-                name: '粉丝',
-                labelStyle: labelStyle,
-                onTap: () => controller.push('fan'),
-              ),
-            ],
-          ),
+          if (controller.isLogin) ...[
+            Row(
+              mainAxisAlignment: .spaceEvenly,
+              children: [
+                _btn(
+                  count: userStat.dynamicCount,
+                  countStyle: style,
+                  name: '动态',
+                  labelStyle: labelStyle,
+                  onTap: () => controller.push('memberDynamics'),
+                ),
+                _btn(
+                  count: userStat.following,
+                  countStyle: style,
+                  name: '关注',
+                  labelStyle: labelStyle,
+                  onTap: () => controller.push('follow'),
+                ),
+                _btn(
+                  count: userStat.follower,
+                  countStyle: style,
+                  name: '粉丝',
+                  labelStyle: labelStyle,
+                  onTap: () => controller.push('fan'),
+                ),
+              ],
+            ),
+          ],
         ],
       );
     });

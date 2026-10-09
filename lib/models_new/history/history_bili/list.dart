@@ -1,8 +1,8 @@
-import 'package:PiliPlus/models_new/history/history.dart';
+import 'package:PiliPlus/models_new/history/history_bili/history.dart';
 import 'package:PiliPlus/pages/common/multi_select/base.dart';
 import 'package:PiliPlus/utils/extension/iterable_ext.dart';
 
-class HistoryItemModel with MultiSelectData {
+class HistoryBiliItemModel with MultiSelectData {
   String? title;
   String? cover;
   List<String>? covers;
@@ -33,7 +33,7 @@ class HistoryItemModel with MultiSelectData {
     return progress == -1 ? 0 : progress * Duration.millisecondsPerSecond;
   }
 
-  HistoryItemModel({
+  HistoryBiliItemModel({
     this.title,
     this.cover,
     this.covers,
@@ -53,8 +53,8 @@ class HistoryItemModel with MultiSelectData {
     this.liveStatus,
   });
 
-  factory HistoryItemModel.fromJson(Map<String, dynamic> json) =>
-      HistoryItemModel(
+  factory HistoryBiliItemModel.fromJson(Map<String, dynamic> json) =>
+      HistoryBiliItemModel(
         title: json['title'] as String?,
         cover: json['cover'] as String?,
         covers: (json['covers'] as List?)?.fromCast(),

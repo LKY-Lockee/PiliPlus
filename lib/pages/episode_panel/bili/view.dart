@@ -38,8 +38,8 @@ import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:material_ui/material_ui.dart';
 
-class EpisodePanel extends CommonSlidePage {
-  const EpisodePanel({
+class EpisodeBiliPanel extends CommonSlidePage {
+  const EpisodeBiliPanel({
     super.key,
     super.enableSlide,
     required this.ugcIntroController,
@@ -82,10 +82,10 @@ class EpisodePanel extends CommonSlidePage {
   final VoidCallback? onClose;
 
   @override
-  State<EpisodePanel> createState() => _EpisodePanelState();
+  State<EpisodeBiliPanel> createState() => _EpisodeBiliPanelState();
 }
 
-class _EpisodePanelState extends State<EpisodePanel>
+class _EpisodeBiliPanelState extends State<EpisodeBiliPanel>
     with TickerProviderStateMixin, CommonSlideMixin {
   // tab
   late final TabController _tabController;
@@ -116,7 +116,7 @@ class _EpisodePanelState extends State<EpisodePanel>
   }
 
   @override
-  void didUpdateWidget(EpisodePanel oldWidget) {
+  void didUpdateWidget(EpisodeBiliPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (showTitle) {
       return;

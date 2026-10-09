@@ -1,31 +1,27 @@
 import 'package:PiliPlus/common/widgets/dialog/dialog.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/user.dart';
-import 'package:PiliPlus/models_new/history/data.dart';
-import 'package:PiliPlus/models_new/history/list.dart';
+import 'package:PiliPlus/models_new/history/history_bili/data.dart';
+import 'package:PiliPlus/models_new/history/history_bili/list.dart';
 import 'package:PiliPlus/models_new/history/tab.dart';
 import 'package:PiliPlus/pages/common/multi_select/multi_select_controller.dart';
 import 'package:PiliPlus/pages/history/base_controller.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
 import 'package:PiliPlus/utils/extension/iterable_ext.dart';
 import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
-import 'package:PiliPlus/utils/storage.dart';
-import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
-class HistoryController
-    extends MultiSelectController<HistoryData, HistoryItemModel>
-    with GetSingleTickerProviderStateMixin {
-  HistoryController(this.type);
+class HistoryBiliController
+    extends MultiSelectController<HistoryData, HistoryBiliItemModel> {
+  HistoryBiliController(this.type);
 
   late final baseCtr = Get.put(HistoryBaseController());
 
   Account get account => baseCtr.account;
 
   final String? type;
-  TabController? tabController;
   late RxList<HistoryTab> tabs = <HistoryTab>[].obs;
 
   int? max;
@@ -40,7 +36,6 @@ class HistoryController
   @override
   void onInit() {
     super.onInit();
-    historyStatus();
     queryData();
   }
 
@@ -52,7 +47,7 @@ class HistoryController
   }
 
   @override
-  List<HistoryItemModel>? getDataList(HistoryData response) {
+  List<HistoryBiliItemModel>? getDataList(HistoryData response) {
     return response.list;
   }
 
@@ -66,29 +61,14 @@ class HistoryController
     if (isRefresh && type == null) {
       if (tabs.isEmpty && data.tab?.isNotEmpty == true) {
         tabs.value = data.tab!;
-        tabController = TabController(
-          length: data.tab!.length + 1,
-          vsync: this,
-        );
       }
     }
 
     return false;
   }
 
-  // 观看历史暂停状态
-  Future<void> historyStatus() async {
-    final res = await UserHttp.historyStatus(account: account);
-    if (res case Success(:final response)) {
-      baseCtr.pauseStatus.value = response;
-      GStorage.localCache.put(LocalCacheKey.historyPause, response);
-    } else {
-      res.toast();
-    }
-  }
-
   // 删除某条历史记录
-  void delHistory(HistoryItemModel item) {
+  void delHistory(HistoryBiliItemModel item) {
     _onDelete({item});
   }
 
@@ -104,7 +84,7 @@ class HistoryController
     }
   }
 
-  Future<void> _onDelete(Set<HistoryItemModel> removeList) async {
+  Future<void> _onDelete(Set<HistoryBiliItemModel> removeList) async {
     SmartDialog.showLoading(msg: '请求中');
     final res = await UserHttp.delHistory(
       removeList
@@ -139,12 +119,6 @@ class HistoryController
     viewAt: viewAt,
     account: account,
   );
-
-  @override
-  void onClose() {
-    tabController?.dispose();
-    super.onClose();
-  }
 
   @override
   Future<void> onReload() {

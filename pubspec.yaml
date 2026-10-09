@@ -92,6 +92,8 @@ dependencies:
   flutter_displaymode: ^0.7.0
   flutter_html: ^3.0.0-beta.2
   flutter_inappwebview: ^6.1.5
+  flutter_js: ^0.8.7
+  flutter_opencc_plus: ^0.1.4
   flutter_smart_dialog:
     git:
       url: https://github.com/bggRGjQaUbCoE/flutter_smart_dialog.git
@@ -106,6 +108,7 @@ dependencies:
     git:
       url: https://github.com/bggRGjQaUbCoE/font_awesome_flutter.git
       ref: v10.9.0
+  gbk_codec: ^0.4.0
   get:
     git:
       url: https://github.com/bggRGjQaUbCoE/getx.git
@@ -141,6 +144,7 @@ dependencies:
   permission_handler_android: ^14.0.0
   permission_handler_apple: ^9.4.7
   permission_handler_platform_interface: ^4.3.0
+  pointycastle: ^3.9.1
   pretty_qr_code: ^3.3.0
   protobuf: ^6.0.0
   re_highlight: ^0.0.3
@@ -161,6 +165,7 @@ dependencies:
   wakelock_plus: ^1.2.8
   waterfall_flow: ^3.1.0
   web_socket_channel: ^3.0.3
+  xml: ^6.5.0
   webdav_client:
     git:
       url: https://github.com/wgh136/webdav_client.git
@@ -268,6 +273,7 @@ flutter:
       platforms: [linux, macos]
     - path: assets/images/live/
     - path: assets/images/paycoins/
+    - path: assets/js/lib/
     - path: assets/shaders/
 
   fonts:
