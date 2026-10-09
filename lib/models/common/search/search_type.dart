@@ -20,10 +20,10 @@ enum SearchType implements EnumWithLabel {
   bili_user('用户'),
   // 专栏：article
   article('专栏'),
-  // 视频：video
-  video('视频'),
   // 点播：tvbox
   vod('点播'),
+  // 视频：video
+  video('视频'),
   ;
 
   // 相簿：photo
@@ -41,5 +41,6 @@ enum SearchType implements EnumWithLabel {
     .live_room,
     .bili_user,
     .article,
+    .vod,
   ];
 }

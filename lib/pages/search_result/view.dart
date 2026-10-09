@@ -187,7 +187,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                           searchType: item,
                           keyword: _searchResultController.keyword,
                         ),
-                        SearchType.vod => SearchVodPanel(
+                        .vod => SearchVodPanel(
                           tag: _tag,
                           searchType: item,
                           keyword: _searchResultController.keyword,
