@@ -218,8 +218,14 @@ abstract final class ImageUtils {
   );
 
   static String thumbnailUrl(String? src, [int maxQuality = 1]) {
-    if (src == null || !_biliImgHostRe.hasMatch(src)) {
-      return src ?? '';
+    if (src == null) {
+      return '';
+    }
+    if (src.startsWith('//')) {
+      src = 'https:$src';
+    }
+    if (!_biliImgHostRe.hasMatch(src)) {
+      return src;
     }
     if (maxQuality != 100) {
       maxQuality = math.max(maxQuality, GlobalData().imgQuality);
