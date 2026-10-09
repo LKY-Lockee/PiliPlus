@@ -48,9 +48,9 @@ class _SearchVodPanelState
   );
 
   @override
-  Widget buildHeader(ThemeData theme) {
+  Widget buildHeader() {
     return SliverFloatingHeaderWidget(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       child: Padding(
         padding: const .fromLTRB(12, 0, 12, 4),
         child: Obx(
@@ -58,9 +58,9 @@ class _SearchVodPanelState
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _sourceItem(theme, null, '全部'),
+                _sourceItem(null, '全部'),
                 for (final source in controller.filterSources)
-                  _sourceItem(theme, source.key, source.name),
+                  _sourceItem(source.key, source.name),
               ],
             ),
           ),
@@ -69,18 +69,18 @@ class _SearchVodPanelState
     );
   }
 
-  Widget _sourceItem(ThemeData theme, String? key, String name) => SearchText(
+  Widget _sourceItem(String? key, String name) => SearchText(
     fontSize: 13,
     text: name,
     bgColor: Colors.transparent,
     textColor: controller.selectedSourceKey.value == key
-        ? theme.colorScheme.primary
-        : theme.colorScheme.outline,
+        ? colorScheme.primary
+        : colorScheme.outline,
     onTap: (_) => controller.onSelectSource(key),
   );
 
   @override
-  Widget buildList(ThemeData theme, List<VodVideo> list) {
+  Widget buildList(List<VodVideo> list) {
     final filtered = controller.filtered(list);
     return SliverGrid.builder(
       gridDelegate: gridDelegate,
