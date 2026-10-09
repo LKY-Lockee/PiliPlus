@@ -185,7 +185,7 @@ class HistoryVodItem extends StatelessWidget {
           ),
           if (item.showTitle?.isNotEmpty == true)
             Text(
-              item.showTitle!,
+              "看到${item.showTitle}",
               style: TextStyle(
                 fontSize: 13,
                 color: theme.colorScheme.outline,

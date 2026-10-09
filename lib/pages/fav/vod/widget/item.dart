@@ -94,7 +94,7 @@ class FavVodItem extends StatelessWidget {
                             height: item.remarks != null ? 2 : 6,
                           ),
                           Text(
-                            item.showTitle!,
+                            "看到${item.showTitle}",
                             style: TextStyle(
                               fontSize: 13,
                               color: colorScheme.onSurfaceVariant,
