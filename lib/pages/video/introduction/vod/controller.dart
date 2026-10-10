@@ -11,6 +11,7 @@ import 'package:PiliPlus/pages/episode_panel/vod/view.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/widgets/intro_detail.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/net/http.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/proxy.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/api/api_config.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/parse_bean.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
@@ -18,6 +19,7 @@ import 'package:PiliPlus/plugin/tvbox/tvbox/osc/cache/vod_collect.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/cache/vod_record.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/server/control_manager.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/default_config.dart';
+import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/m3u8.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/parser/super_parse.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/search_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/string_utils.dart';
@@ -248,6 +250,8 @@ class VodIntroController extends CommonIntroController {
       url = result;
     }
 
+    url = await _purifyIfNeeded(url, playInfo.headers, group.flag);
+
     flagIndex.value = flag;
     episodeIndex.value = index;
     detail.refresh();
@@ -269,6 +273,93 @@ class VodIntroController extends CommonIntroController {
     await videoDetailCtr.playerInit(autoFullScreenFlag: autoFullScreenFlag);
     saveRecord();
     return true;
+  }
+
+  /// com.github.tvbox.osc.player.controller.VodController.processM3u8Content
+  Future<String> _purifyIfNeeded(
+    String url,
+    Map<String, String> headers,
+    String flag,
+  ) async {
+    if (!Pref.vodM3u8Purify) return url;
+    if (url.startsWith('http://127.0.0.1') || !url.contains('.m3u8')) {
+      return url;
+    }
+    if (DefaultConfig.noAd(flag)) return url;
+    try {
+      var content = await _fetchM3u8(url, headers);
+      if (content == null || !content.startsWith('#EXTM3U')) return url;
+      var baseUrl = url;
+      final forwardUrl = _extractForwardUrl(url, content);
+      if (forwardUrl.isNotEmpty) {
+        final forwardContent = await _fetchM3u8(forwardUrl, headers);
+        if (forwardContent == null || !forwardContent.startsWith('#EXTM3U')) {
+          return url;
+        }
+        content = forwardContent;
+        baseUrl = forwardUrl;
+      }
+      final basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+      final purified = M3u8.purify(basePath, content);
+      if (purified == null || M3u8.currentAdCount == 0) return url;
+      await ControlManager.instance.ensureServer();
+      ControlManager.instance.m3u8Content = purified;
+      if (Pref.vodAdRemoveToast) {
+        SmartDialog.showToast('已移除视频广告 ${M3u8.currentAdCount} 条');
+      }
+      return 'http://127.0.0.1:${Proxy.getPort()}/proxyM3u8';
+    } catch (e) {
+      debugPrint('[tvbox] m3u8 purify failed: $e');
+      return url;
+    }
+  }
+
+  Future<String?> _fetchM3u8(
+    String url,
+    Map<String, String> headers,
+  ) {
+    return Http.string(
+      url,
+      options: Options(
+        responseType: ResponseType.plain,
+        headers: headers.isEmpty ? null : headers,
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
+      ),
+    );
+  }
+
+  /// com.github.tvbox.osc.player.controller.VodController.extractForwardUrl
+  String _extractForwardUrl(String baseUrl, String content) {
+    final lines = content.split(RegExp(r'\r?\n'));
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].trim().startsWith('#EXT-X-STREAM-INF')) {
+        for (var j = i + 1; j < lines.length; j++) {
+          final target = lines[j].trim();
+          if (target.isEmpty) continue;
+          if (_isValidM3u8Line(target)) {
+            return _resolveForwardUrl(baseUrl, target);
+          }
+        }
+      }
+    }
+    return '';
+  }
+
+  /// com.github.tvbox.osc.player.controller.VodController.isValidM3u8Line
+  bool _isValidM3u8Line(String line) {
+    return !line.startsWith('#') &&
+        (line.endsWith('.m3u8') || line.contains('.m3u8?'));
+  }
+
+  /// com.github.tvbox.osc.player.controller.VodController.resolveForwardUrl
+  String _resolveForwardUrl(String baseUrl, String line) {
+    try {
+      return Uri.parse(baseUrl).resolve(line).toString();
+    } catch (_) {
+      return '';
+    }
   }
 
   @override

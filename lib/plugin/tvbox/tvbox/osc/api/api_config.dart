@@ -6,6 +6,7 @@ import 'package:PiliPlus/plugin/tvbox/catvod/crawler/spider.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/net/http.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/parse_bean.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
+import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/ad_blocker.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/aes.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/m3u8.dart';
@@ -101,6 +102,7 @@ class ApiConfig {
         return null;
       }
       _parseRules(json['rules']);
+      _parseAdHosts(json['ads']);
       TVBoxHttpHelper.setDnsList(config.myHosts);
       return config;
     } catch (_) {
@@ -181,8 +183,19 @@ class ApiConfig {
     return const [];
   }
 
+  /// com.github.tvbox.osc.api.ApiConfig.parseJson
+  static void _parseAdHosts(dynamic adsJson) {
+    AdBlocker.reset();
+    if (adsJson is List) {
+      for (final host in adsJson.whereType<String>()) {
+        AdBlocker.addAdHost(host);
+      }
+    }
+  }
+
   static void _clearRuntimeConfig() {
     VideoParseRuler.clearRule();
+    AdBlocker.reset();
     TVBoxHttpHelper.setDnsList(const {});
   }
 

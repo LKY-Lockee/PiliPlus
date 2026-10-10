@@ -60,7 +60,7 @@ class SearchVodController
       final state = tvboxService.sourcesState.value;
       return state is Error
           ? state
-          : const Error('无可用点播源，请先在 设置-第三方平台设置-点播设置 中配置订阅');
+          : const Error('无可用点播源，请先在 设置-第三方平台设置-点播设置-源设置 中配置订阅');
     }
     selectedSourceKey.value = null;
     final results = <VodVideo>[];

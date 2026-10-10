@@ -6,8 +6,8 @@ import 'package:material_ui/material_ui.dart';
 List<SettingsModel> get thirdPartySettings => [
   NormalModel(
     title: '点播设置',
-    subtitle: '订阅地址、点播源管理、解析、UA、首页源',
+    subtitle: '源设置、去广告',
     leading: const Icon(MdiIcons.movieOpenOutline),
-    onTap: (context, setState) => Get.toNamed('/vodSourceManage'),
+    onTap: (context, setState) => Get.toNamed('/vodSettings'),
   ),
 ];

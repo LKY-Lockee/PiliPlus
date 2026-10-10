@@ -347,6 +347,24 @@ abstract final class Pref {
     return value is List && value.isNotEmpty;
   }
 
+  static bool get vodM3u8Purify =>
+      _setting.get(SettingBoxKey.vodM3u8Purify, defaultValue: true);
+
+  static set setVodM3u8Purify(bool value) =>
+      _setting.put(SettingBoxKey.vodM3u8Purify, value);
+
+  static bool get vodWebAdBlock =>
+      _setting.get(SettingBoxKey.vodWebAdBlock, defaultValue: false);
+
+  static set setVodWebAdBlock(bool value) =>
+      _setting.put(SettingBoxKey.vodWebAdBlock, value);
+
+  static bool get vodAdRemoveToast =>
+      _setting.get(SettingBoxKey.vodAdRemoveToast, defaultValue: true);
+
+  static set setVodAdRemoveToast(bool value) =>
+      _setting.put(SettingBoxKey.vodAdRemoveToast, value);
+
   static Future<void> clearVodEnabledSites() =>
       _setting.delete(SettingBoxKey.vodEnabledSites);
 

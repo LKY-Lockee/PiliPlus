@@ -5,9 +5,11 @@ import 'package:PiliPlus/common/widgets/scaffold/simple_scaffold.dart';
 import 'package:PiliPlus/http/browser_ua.dart';
 import 'package:PiliPlus/main.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
+import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/ad_blocker.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/video_parse_ruler.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/viewmodel/source_view_model.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox_service.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
@@ -125,6 +127,9 @@ class _VodSnifferPageState extends State<VodSnifferPage> {
           final requestUrl = request.url.toString();
           if (VideoParseRuler.isFilter(url, requestUrl)) {
             return null;
+          }
+          if (Pref.vodWebAdBlock && AdBlocker.isAd(requestUrl)) {
+            return WebResourceResponse();
           }
           if (await _checkVideoFormat(requestUrl)) {
             _onFound(requestUrl);

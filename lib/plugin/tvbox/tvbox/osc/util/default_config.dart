@@ -29,6 +29,33 @@ class DefaultConfig {
     return _videoFmtExp.hasMatch(url);
   }
 
+  /// com.github.tvbox.osc.util.DefaultConfig.NO_AD_KEYWORDS
+  static const List<String> noAdKeywords = [
+    'tx',
+    'youku',
+    'qq',
+    'qiyi',
+    'letv',
+    'leshi',
+    'sohu',
+    'mgtv',
+    'bilibili',
+    'imgo',
+    '优酷',
+    '芒果',
+    '腾讯',
+    '奇艺',
+  ];
+
+  /// com.github.tvbox.osc.util.DefaultConfig.noAd
+  static bool noAd(String? flag) {
+    if (flag == null || flag.isEmpty) return false;
+    for (final keyword in noAdKeywords) {
+      if (flag == keyword || flag.contains(keyword)) return true;
+    }
+    return false;
+  }
+
   /// com.github.tvbox.osc.util.DefaultConfig.safeJsonInt
   static int safeJsonInt(dynamic v, int def) {
     if (v is int) {

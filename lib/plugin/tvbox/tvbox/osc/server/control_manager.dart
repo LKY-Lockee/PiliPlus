@@ -19,6 +19,19 @@ class ControlManager {
 
   ControlManager._();
 
+  /// com.github.tvbox.osc.server.RemoteServer.m3u8Content
+  String? m3u8Content;
+
+  Future<void> _handleProxyM3u8(HttpRequest req) async {
+    req.response.statusCode = 200;
+    req.response.headers.set(
+      HttpHeaders.contentTypeHeader,
+      'application/vnd.apple.mpegurl',
+    );
+    req.response.write(m3u8Content ?? '');
+    await req.response.close();
+  }
+
   Future<void> _handleSuperParse(HttpRequest req) async {
     try {
       final params = req.uri.queryParameters;
@@ -52,6 +65,10 @@ class ControlManager {
       final uri = req.uri;
       if (uri.path == '/superparse') {
         await _handleSuperParse(req);
+        return;
+      }
+      if (uri.path == '/proxyM3u8') {
+        await _handleProxyM3u8(req);
         return;
       }
       if (uri.path != '/proxy') {

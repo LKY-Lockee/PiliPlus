@@ -386,7 +386,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SimpleScaffold(
-      appBar: AppBar(title: const Text('点播设置')),
+      appBar: AppBar(title: const Text('源设置')),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 100),
         children: [
