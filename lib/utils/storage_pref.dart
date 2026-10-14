@@ -372,7 +372,7 @@ abstract final class Pref {
       _setting.put(SettingBoxKey.vodAutoChangeSource, value);
 
   static int get vodAutoChangeSourceRetry =>
-      _setting.get(SettingBoxKey.vodAutoChangeSourceRetry, defaultValue: 0);
+      _setting.get(SettingBoxKey.vodAutoChangeSourceRetry, defaultValue: 3);
 
   static bool get vodAutoSwitchLine =>
       _setting.get(SettingBoxKey.vodAutoSwitchLine, defaultValue: true);
