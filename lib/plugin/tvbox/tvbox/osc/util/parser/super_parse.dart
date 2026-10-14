@@ -7,6 +7,7 @@ import 'package:PiliPlus/plugin/tvbox/tvbox/osc/api/api_config.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/parse_bean.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/parser/json_parallel.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/parser/utils.dart';
+import 'package:dio/dio.dart';
 
 /// com.github.tvbox.osc.util.parser.SuperParse
 class SuperParse {
@@ -25,8 +26,9 @@ class SuperParse {
   static Future<LoadingState<VodPlayInfo>> resolve(
     ApiConfig cfg,
     VodPlayInfo info,
-    String flag,
-  ) async {
+    String flag, {
+    CancelToken? cancelToken,
+  }) async {
     final cands = candidates(
       cfg,
       flag,
@@ -35,7 +37,11 @@ class SuperParse {
     final webParses = cands.where((p) => p.type == 0).toList();
 
     if (jsonParses.isNotEmpty) {
-      final hit = await JsonParallel.parse(jsonParses, info.url);
+      final hit = await JsonParallel.parse(
+        jsonParses,
+        info.url,
+        cancelToken: cancelToken,
+      );
       if (hit != null) {
         return Success(
           info.copyWith(

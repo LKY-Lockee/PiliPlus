@@ -14,8 +14,9 @@ class JsonParallel {
   /// com.github.tvbox.osc.util.parser.JsonParallel.parse
   static Future<({String url, Map<String, String> headers})?> _requestJson(
     ParseBean parse,
-    String videoUrl,
-  ) async {
+    String videoUrl, {
+    CancelToken? cancelToken,
+  }) async {
     final (realUrl, catHeaders) = parseCatExt(parse.mixUrl());
     final requestUrl = '$realUrl${StringUtils.javaUrlEncode(videoUrl)}';
     final resp = await Http.get(
@@ -26,6 +27,7 @@ class JsonParallel {
         receiveTimeout: const Duration(seconds: 8),
         sendTimeout: const Duration(seconds: 8),
       ),
+      cancelToken: cancelToken,
     );
     final data = resp.data;
     if (data == null) return null;
@@ -64,12 +66,13 @@ class JsonParallel {
   /// com.github.tvbox.osc.util.parser.JsonParallel.parse
   static Future<({String url, Map<String, String> headers})?> parse(
     List<ParseBean> parses,
-    String videoUrl,
-  ) {
+    String videoUrl, {
+    CancelToken? cancelToken,
+  }) {
     final completer = Completer<({String url, Map<String, String> headers})?>();
     var remaining = parses.length;
     for (final parse in parses) {
-      _requestJson(parse, videoUrl).then(
+      _requestJson(parse, videoUrl, cancelToken: cancelToken).then(
         (hit) {
           if (hit != null && !completer.isCompleted) {
             completer.complete(hit);

@@ -224,7 +224,11 @@ abstract final class SettingBoxKey {
       vodHomeRec = 'vodHomeRec',
       vodM3u8Purify = 'vodM3u8Purify',
       vodWebAdBlock = 'vodWebAdBlock',
-      vodAdRemoveToast = 'vodAdRemoveToast';
+      vodAdRemoveToast = 'vodAdRemoveToast',
+      vodAutoChangeSource = 'vodAutoChangeSource',
+      vodAutoChangeSourceRetry = 'vodAutoChangeSourceRetry',
+      vodAutoSwitchLine = 'vodAutoSwitchLine',
+      vodAutoSwitchLineRetry = 'vodAutoSwitchLineRetry';
 
   static const String themeMode = 'themeMode',
       defaultTextScale = 'textScale',

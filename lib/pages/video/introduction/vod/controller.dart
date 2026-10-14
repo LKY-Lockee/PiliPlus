@@ -9,7 +9,9 @@ import 'package:PiliPlus/models_new/vod/play.dart';
 import 'package:PiliPlus/pages/common/common_intro_controller.dart';
 import 'package:PiliPlus/pages/episode_panel/vod/view.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/widgets/intro_detail.dart';
+import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
+import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/net/http.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/proxy.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/api/api_config.dart';
@@ -35,8 +37,8 @@ import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
 class VodIntroController extends CommonIntroController {
-  late final String sourceKey;
-  late final String vodId;
+  late String sourceKey;
+  late String vodId;
 
   @override
   void queryVideoIntro() {}
@@ -136,11 +138,7 @@ class VodIntroController extends CommonIntroController {
     isDetailLoading.value = false;
     if (isClosed) return;
     if (res case Success(:final response)) {
-      detail.value = response;
-      videoDetail.value.title = response.video.title;
-      if (response.video.cover?.isNotEmpty == true) {
-        videoDetailCtr.cover.value = response.video.cover!;
-      }
+      _applyDetail(response);
       if (response.playFlags.isEmpty) {
         SmartDialog.showToast('暂无播放资源');
         return;
@@ -172,6 +170,14 @@ class VodIntroController extends CommonIntroController {
     }
   }
 
+  void _applyDetail(VodInfoModel response) {
+    detail.value = response;
+    videoDetail.value.title = response.video.title;
+    if (response.video.cover?.isNotEmpty == true) {
+      videoDetailCtr.cover.value = response.video.cover!;
+    }
+  }
+
   Future<void> playCurrent({bool autoFullScreenFlag = false}) async {
     if (playFlags.isEmpty || episodeIndex.value < 0) {
       return;
@@ -183,50 +189,350 @@ class VodIntroController extends CommonIntroController {
     );
   }
 
+  static const int _autoRetryIdleMs = 60 * 1000;
+  static const Duration _playStartTimeout = Duration(seconds: 20);
+
+  final Set<String> _triedLineFlags = {};
+  int _lastAutoRetryMs = 0;
+  int _lineCycleCount = 0;
+
+  final Set<String> _triedSourceKeys = {};
+  int _sourceSwitchCount = 0;
+  CancelToken? _resolveCancelToken;
+  Completer<bool>? _playStartCompleter;
+  int _playRunId = 0;
+
+  bool get _autoChangeSourceEnabled =>
+      Pref.vodAutoChangeSource && !videoDetailCtr.isFullScreen;
+
+  bool _stale(int runId) => isClosed || runId != _playRunId;
+
+  int _startPlayRun() {
+    final runId = ++_playRunId;
+    _resolveCancelToken?.cancel('superseded');
+    final completer = _playStartCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(false);
+    }
+    _playStartCompleter = null;
+    return runId;
+  }
+
   /// com.github.tvbox.osc.ui.fragment.PlayFragment.play
   Future<bool> playEpisode(
     int flag,
     int index, {
     bool autoFullScreenFlag = false,
+    Duration? inheritPosition,
+  }) async {
+    final runId = _startPlayRun();
+    _resetLineState();
+    _triedSourceKeys
+      ..clear()
+      ..add(sourceKey);
+    _sourceSwitchCount = 0;
+    var sourceFlag = flag;
+    var sourceIndex = index;
+    var fullScreen = autoFullScreenFlag;
+    Duration? inherit = inheritPosition;
+    String? lastError;
+    while (true) {
+      if (_stale(runId)) {
+        return false;
+      }
+      final r = await _playSourceLines(
+        runId,
+        sourceFlag,
+        sourceIndex,
+        autoFullScreenFlag: fullScreen,
+        inheritPosition: inherit,
+      );
+      if (r.ok) {
+        return true;
+      }
+      if (_stale(runId)) {
+        return false;
+      }
+      lastError = r.error;
+      inherit ??= _currentPosition();
+      if (!_autoChangeSourceEnabled) {
+        break;
+      }
+      final switched = await _tryNextSource(runId, r.lastEpisode);
+      if (!switched) {
+        break;
+      }
+      _resetLineState();
+      sourceFlag = flagIndex.value;
+      sourceIndex = episodeIndex.value;
+      fullScreen = false;
+    }
+    if (!_stale(runId) && lastError != null && lastError.isNotEmpty) {
+      SmartDialog.showToast(lastError);
+    }
+    return false;
+  }
+
+  Future<({bool ok, String? error, VodEpisode? lastEpisode})> _playSourceLines(
+    int runId,
+    int flag,
+    int index, {
+    required bool autoFullScreenFlag,
+    Duration? inheritPosition,
+  }) async {
+    var attemptFlag = flag;
+    var attemptIndex = index;
+    var fullScreen = autoFullScreenFlag;
+    Duration? inherit = inheritPosition;
+    String? lastError;
+    VodEpisode? lastEpisode;
+    while (true) {
+      if (_stale(runId)) {
+        return (ok: false, error: null, lastEpisode: lastEpisode);
+      }
+      lastEpisode = _episodeOf(attemptFlag, attemptIndex) ?? lastEpisode;
+      final err = await _playAttempt(
+        runId,
+        attemptFlag,
+        attemptIndex,
+        autoFullScreenFlag: fullScreen,
+        inheritPosition: inherit,
+      );
+      if (err == null) {
+        return (ok: true, error: null, lastEpisode: lastEpisode);
+      }
+      if (_stale(runId)) {
+        return (ok: false, error: null, lastEpisode: lastEpisode);
+      }
+      lastError = err;
+      inherit ??= _currentPosition();
+      final next = _prepareNextLine(attemptFlag, attemptIndex);
+      if (next == null) {
+        break;
+      }
+      fullScreen = false;
+      SmartDialog.showToast('自动切换线路: ${playFlags[next.$1].flag}');
+      attemptFlag = next.$1;
+      attemptIndex = next.$2;
+    }
+    return (ok: false, error: lastError, lastEpisode: lastEpisode);
+  }
+
+  /// com.github.tvbox.osc.ui.activity.DetailActivity.scheduleDetailFallbackSearch
+  Future<bool> _switchToSource(
+    int runId,
+    String key, {
+    VodEpisode? target,
+  }) async {
+    if (_stale(runId)) {
+      return false;
+    }
+    final cfg = tvboxService.config;
+    final title = detail.value?.video.title;
+    if (cfg == null || title == null || title.trim().isEmpty) {
+      return false;
+    }
+    final keyword = title.trim();
+    SmartDialog.showLoading(msg: '搜索换源');
+    final results = await SearchHelper.searchSource(cfg, key, keyword);
+    if (isClosed || !_stale(runId)) {
+      SmartDialog.dismiss();
+    }
+    if (_stale(runId)) {
+      return false;
+    }
+    final match = results
+        .where((video) => video.title.trim() == keyword)
+        .firstOrNull;
+    if (match == null) {
+      return false;
+    }
+    return _switchSource(runId, key, match.id, target);
+  }
+
+  /// com.github.tvbox.osc.ui.activity.DetailActivity.startDetailFallback
+  Future<bool> _tryNextSource(int runId, VodEpisode? target) async {
+    if (_stale(runId)) {
+      return false;
+    }
+    final limit = Pref.vodAutoChangeSourceRetry;
+    if (limit != 0 && _sourceSwitchCount >= limit) {
+      return false;
+    }
+    for (final bean in tvboxService.sources) {
+      if (_stale(runId)) {
+        return false;
+      }
+      if (!bean.changeable || !bean.searchable) {
+        continue;
+      }
+      if (bean.key == sourceKey || _triedSourceKeys.contains(bean.key)) {
+        continue;
+      }
+      _triedSourceKeys.add(bean.key);
+      final switched = await _switchToSource(runId, bean.key, target: target);
+      if (switched) {
+        _sourceSwitchCount++;
+        SmartDialog.showToast('自动切换源: ${bean.name}');
+        return true;
+      }
+      if (_stale(runId)) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /// com.github.tvbox.osc.ui.activity.DetailActivity.loadNextDetailFallbackSource
+  Future<bool> _switchSource(
+    int runId,
+    String key,
+    String id,
+    VodEpisode? target,
+  ) async {
+    if (_stale(runId)) {
+      return false;
+    }
+    final cfg = tvboxService.config;
+    if (cfg == null) {
+      return false;
+    }
+    final res = await SourceViewModel(
+      config: cfg,
+      sourceKey: key,
+    ).getDetail(id);
+    if (_stale(runId)) {
+      return false;
+    }
+    if (res case Success(:final response)) {
+      if (response.playFlags.isEmpty) {
+        return false;
+      }
+      sourceKey = key;
+      vodId = id;
+      isFav.value = VodCollect.isFav(key, id);
+      _applyDetail(response);
+      final (fi, ei) = _findEpisodeInDetail(target);
+      flagIndex.value = fi;
+      episodeIndex.value = ei;
+      detail.refresh();
+      return true;
+    }
+    return false;
+  }
+
+  /// com.github.tvbox.osc.ui.activity.DetailActivity.restoreDetailFallbackEpisode
+  (int, int) _findEpisodeInDetail(VodEpisode? target) {
+    if (target != null) {
+      for (var i = 0; i < playFlags.length; i++) {
+        final idx = _findMatchingEpisodeIndex(target, playFlags[i].episodes);
+        if (idx >= 0) {
+          return (i, idx);
+        }
+      }
+    }
+    return (0, 0);
+  }
+
+  /// com.github.tvbox.osc.ui.activity.DetailActivity.findMatchingEpisodeIndex
+  int _findMatchingEpisodeIndex(VodEpisode? current, List<VodEpisode> target) {
+    if (target.isEmpty) {
+      return -1;
+    }
+    if (target.length == 1) {
+      return 0;
+    }
+    final currentName = current?.name ?? '';
+    if (currentName.isEmpty) {
+      return -1;
+    }
+    final currentEpisode = _extractEpisodeNumber(currentName);
+    var matchedIndex = -1;
+    var bestScore = 0;
+    for (var i = 0; i < target.length; i++) {
+      final score = _getEpisodeMatchScore(
+        currentName,
+        currentEpisode,
+        target[i].name,
+      );
+      if (score > bestScore) {
+        bestScore = score;
+        matchedIndex = i;
+      }
+    }
+    return matchedIndex;
+  }
+
+  Future<String?> _playAttempt(
+    int runId,
+    int flag,
+    int index, {
+    required bool autoFullScreenFlag,
+    Duration? inheritPosition,
   }) async {
     final src = source;
     final cfg = tvboxService.config;
     final data = detail.value;
     if (src == null || cfg == null || data == null) {
-      return false;
+      return '点播源不可用';
+    }
+    if (flag < 0 || flag >= data.playFlags.length) {
+      return '线路不可用';
     }
     final group = data.playFlags[flag];
+    if (index < 0 || index >= group.episodes.length) {
+      return '剧集不可用';
+    }
     final episode = group.episodes[index];
 
     SmartDialog.showLoading(msg: '获取播放地址');
     LoadingState<VodPlayInfo> res;
+    final cancelToken = CancelToken();
+    _resolveCancelToken = cancelToken;
     try {
-      final info = await SourceViewModel(
-        config: cfg,
-        sourceKey: sourceKey,
-      ).getPlay(group.flag, episode.url);
-      res = switch (info) {
-        Success(:final response) => await _resolve(
-          cfg,
-          response,
-          group.flag,
-        ),
-        _ => info,
-      };
+      res = await () async {
+        final info = await SourceViewModel(
+          config: cfg,
+          sourceKey: sourceKey,
+        ).getPlay(group.flag, episode.url, cancelToken: cancelToken);
+        return switch (info) {
+          Success(:final response) => await _resolve(
+            cfg,
+            response,
+            group.flag,
+            cancelToken: cancelToken,
+          ),
+          _ => info,
+        };
+      }().timeout(_resolveTimeoutOf(src));
+    } on TimeoutException {
+      cancelToken.cancel('resolve timeout');
+      if (isClosed || !_stale(runId)) {
+        SmartDialog.dismiss();
+      }
+      return _stale(runId) ? null : '获取播放地址超时';
     } catch (e) {
+      cancelToken.cancel('resolve failed');
       res = Error(e.toString());
     }
-    SmartDialog.dismiss();
+    if (isClosed || !_stale(runId)) {
+      SmartDialog.dismiss();
+    }
+    if (_stale(runId)) {
+      return null;
+    }
 
-    VodPlayInfo? playInfo = res.dataOrNull;
+    final playInfo = res.dataOrNull;
     if (playInfo == null) {
-      res.toast();
-      return false;
+      if (!Pref.vodAutoSwitchLine) {
+        res.toast();
+        return '';
+      }
+      return '获取播放地址失败';
     }
     var url = playInfo.url;
     if (url.isEmpty) {
-      SmartDialog.showToast('获取播放地址失败');
-      return false;
+      return '获取播放地址失败';
     }
     if (playInfo.sniffUrl case final sniffUrl?) {
       isSniffing = true;
@@ -243,14 +549,19 @@ class VodIntroController extends CommonIntroController {
       } finally {
         isSniffing = false;
       }
+      if (_stale(runId)) {
+        return null;
+      }
       if (result == null || result.isEmpty) {
-        SmartDialog.showToast('嗅探失败');
-        return false;
+        return '嗅探失败';
       }
       url = result;
     }
 
     url = await _purifyIfNeeded(url, playInfo.headers, group.flag);
+    if (_stale(runId)) {
+      return null;
+    }
 
     flagIndex.value = flag;
     episodeIndex.value = index;
@@ -265,14 +576,268 @@ class VodIntroController extends CommonIntroController {
       ..videoUrl = url
       ..audioUrl = ''
       ..cid.value = index
-      ..defaultST = null;
-    final progress = VodRecord.getProgress(progressKeyOf);
-    if (progress != null && progress > 5000) {
-      videoDetailCtr.defaultST = Duration(milliseconds: progress);
-    }
+      ..defaultST = inheritPosition ?? _savedSeek();
     await videoDetailCtr.playerInit(autoFullScreenFlag: autoFullScreenFlag);
     saveRecord();
-    return true;
+    if (_stale(runId)) {
+      return null;
+    }
+    final player = videoDetailCtr.plPlayerController;
+    if (player.dataStatus.value == DataStatus.error) {
+      return '播放失败';
+    }
+    if (!videoDetailCtr.autoPlay) {
+      return null;
+    }
+    final started = await _waitPlaybackStarted(runId);
+    if (_stale(runId)) {
+      return null;
+    }
+    return started ? null : '播放超时';
+  }
+
+  /// com.github.tvbox.osc.ui.fragment.PlayFragment.getResolvePlayUrlTimeoutMs
+  Duration _resolveTimeoutOf(SourceBean src) {
+    final seconds = src.playTimeoutSeconds + 1;
+    return Duration(seconds: seconds < 15 ? 15 : seconds);
+  }
+
+  /// com.github.tvbox.osc.ui.fragment.PlayFragment.tryNextLine
+  (int, int)? _prepareNextLine(int attemptFlag, int attemptIndex) {
+    if (!Pref.vodAutoSwitchLine || videoDetailCtr.isFullScreen) {
+      _resetLineState();
+      return null;
+    }
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now - _lastAutoRetryMs > _autoRetryIdleMs) {
+      _triedLineFlags.clear();
+      _lineCycleCount = 0;
+    }
+    _lastAutoRetryMs = now;
+
+    final n = playFlags.length;
+    if (n == 0) {
+      _resetLineState();
+      return null;
+    }
+    final currentFlag = attemptFlag >= 0 && attemptFlag < n
+        ? playFlags[attemptFlag].flag
+        : (flagIndex.value >= 0 && flagIndex.value < n
+              ? playFlags[flagIndex.value].flag
+              : '');
+    final currentEpisode = _episodeOf(attemptFlag, attemptIndex);
+    if (currentFlag.isNotEmpty) {
+      _triedLineFlags.add(currentFlag);
+    }
+    final start = attemptFlag >= 0 && attemptFlag < n ? attemptFlag : -1;
+    for (var step = 1; step <= n; step++) {
+      final i = (start + step) % n;
+      if (!_triedLineFlags.contains(playFlags[i].flag) &&
+          playFlags[i].episodes.isNotEmpty) {
+        return (
+          i,
+          _findSameEpisodeIndex(
+            currentEpisode,
+            playFlags[i].episodes,
+            attemptIndex,
+          ),
+        );
+      }
+    }
+    _triedLineFlags.clear();
+    _lineCycleCount++;
+    final limit = Pref.vodAutoSwitchLineRetry;
+    if (limit != 0 && _lineCycleCount >= limit) {
+      _resetLineState();
+      return null;
+    }
+    for (var i = 0; i < n; i++) {
+      if (playFlags[i].episodes.isNotEmpty) {
+        return (
+          i,
+          _findSameEpisodeIndex(
+            currentEpisode,
+            playFlags[i].episodes,
+            attemptIndex,
+          ),
+        );
+      }
+    }
+    _resetLineState();
+    return null;
+  }
+
+  /// com.github.tvbox.osc.ui.fragment.PlayFragment.findSameEpisodeIndex
+  int _findSameEpisodeIndex(
+    VodEpisode? current,
+    List<VodEpisode> target,
+    int fallback,
+  ) {
+    if (target.isEmpty) {
+      return 0;
+    }
+    if (target.length == 1) {
+      return 0;
+    }
+    final currentName = current?.name ?? '';
+    if (currentName.isEmpty) {
+      return fallback.clamp(0, target.length - 1);
+    }
+    final currentEpisode = _extractEpisodeNumber(currentName);
+    var matchedIndex = -1;
+    var bestScore = 0;
+    for (var i = 0; i < target.length; i++) {
+      final score = _getEpisodeMatchScore(
+        currentName,
+        currentEpisode,
+        target[i].name,
+      );
+      if (score > bestScore) {
+        bestScore = score;
+        matchedIndex = i;
+      }
+    }
+    if (matchedIndex >= 0) {
+      return matchedIndex;
+    }
+    return fallback.clamp(0, target.length - 1);
+  }
+
+  /// com.github.tvbox.osc.ui.fragment.PlayFragment.getEpisodeMatchScore
+  int _getEpisodeMatchScore(
+    String currentName,
+    int currentEpisode,
+    String targetName,
+  ) {
+    if (currentName.isEmpty || targetName.isEmpty) {
+      return 0;
+    }
+    if (targetName.toLowerCase() == currentName.toLowerCase()) {
+      return 100;
+    }
+    if (currentEpisode >= 0 &&
+        _extractEpisodeNumber(targetName) == currentEpisode) {
+      return 80;
+    }
+    final currentLower = currentName.toLowerCase();
+    final targetLower = targetName.toLowerCase();
+    if (currentEpisode < 0 &&
+        currentName.length >= 2 &&
+        targetLower.contains(currentLower)) {
+      return 70;
+    }
+    if (currentEpisode < 0 &&
+        targetName.length >= 2 &&
+        currentLower.contains(targetLower)) {
+      return 60;
+    }
+    return 0;
+  }
+
+  /// com.github.tvbox.osc.ui.fragment.PlayFragment.extractEpisodeNumber
+  int _extractEpisodeNumber(String name) {
+    if (name.isEmpty) {
+      return -1;
+    }
+    try {
+      var text = name.replaceAll(RegExp(r'\[.*?\]|\(.*?\)'), '');
+      text = text.replaceAll(RegExp(r'\b(19|20)\d{2}\b'), '');
+      text = text.toLowerCase().replaceAll(
+        RegExp(r'2160p|1080p|720p|480p|4k|h26[45]|x26[45]|mp4'),
+        '',
+      );
+      final matcher = RegExp(
+        r'(?:ep|第|e|[-.\s])\s?(\d{1,4})',
+        caseSensitive: false,
+      ).firstMatch(text);
+      if (matcher != null) {
+        return int.parse(matcher.group(1)!);
+      }
+      final number = text.replaceAll(RegExp(r'\D+'), '');
+      if (number.isNotEmpty) {
+        return int.parse(number);
+      }
+    } catch (_) {}
+    return -1;
+  }
+
+  /// com.github.tvbox.osc.ui.fragment.PlayFragment.isPlaybackStarted
+  Future<bool> _waitPlaybackStarted(int runId) async {
+    if (_stale(runId)) {
+      return false;
+    }
+    final player = videoDetailCtr.plPlayerController;
+    if (player.dataStatus.value == DataStatus.error) {
+      return false;
+    }
+    final base = player.position.value;
+    bool started() => player.position.value > base + 1;
+    if (started()) {
+      return true;
+    }
+    final completer = Completer<bool>();
+    _playStartCompleter = completer;
+    void onStatus(PlayerStatus _) {
+      if (!completer.isCompleted && started()) {
+        completer.complete(true);
+      }
+    }
+
+    void onPosition(Duration _) {
+      if (!completer.isCompleted && started()) {
+        completer.complete(true);
+      }
+    }
+
+    player
+      ..addStatusLister(onStatus)
+      ..addPositionListener(onPosition);
+    final timer = Timer(_playStartTimeout, () {
+      if (!completer.isCompleted) {
+        completer.complete(false);
+      }
+    });
+    final result = await completer.future;
+    _playStartCompleter = null;
+    timer.cancel();
+    player
+      ..removeStatusLister(onStatus)
+      ..removePositionListener(onPosition);
+    return result;
+  }
+
+  VodEpisode? _episodeOf(int flag, int index) {
+    if (flag < 0 || flag >= playFlags.length) {
+      return null;
+    }
+    final list = playFlags[flag].episodes;
+    if (index < 0 || index >= list.length) {
+      return null;
+    }
+    return list[index];
+  }
+
+  Duration? _savedSeek() {
+    final progress = VodRecord.getProgress(progressKeyOf);
+    if (progress != null && progress > 5000) {
+      return Duration(milliseconds: progress);
+    }
+    return null;
+  }
+
+  Duration _currentPosition() {
+    final state =
+        videoDetailCtr.plPlayerController.videoPlayerController?.state.position;
+    final ms = state != null && state.inMilliseconds > _lastSavedMs
+        ? state.inMilliseconds
+        : _lastSavedMs;
+    return Duration(milliseconds: ms);
+  }
+
+  void _resetLineState() {
+    _triedLineFlags.clear();
+    _lineCycleCount = 0;
+    _lastAutoRetryMs = 0;
   }
 
   /// com.github.tvbox.osc.player.controller.VodController.processM3u8Content
@@ -474,28 +1039,29 @@ class VodIntroController extends CommonIntroController {
           return;
         }
         final target = tvboxService.sourceByKey(selected);
-        final cfg = tvboxService.config;
-        if (target == null || cfg == null) {
+        if (target == null) {
           return;
         }
-        SmartDialog.showLoading(msg: '搜索换源');
-        final results = await SearchHelper.searchSource(
-          cfg,
-          target.key,
-          data.video.title,
+        final runId = _startPlayRun();
+        final inherit = _currentPosition();
+        final episode = currentEpisode;
+        final switched = await _switchToSource(
+          runId,
+          selected,
+          target: episode,
         );
-        SmartDialog.dismiss();
-        if (isClosed || results.isEmpty) {
+        if (_stale(runId)) {
+          return;
+        }
+        if (!switched) {
           SmartDialog.showToast('该源未找到此内容');
           return;
         }
-        final item = results.first;
-        PageUtils.toVodPage(
-          sourceKey: item.sourceKey,
-          vodId: item.id,
-          title: data.video.title,
-          cover: data.video.cover,
-          off: true,
+        SmartDialog.showToast('已切换源: ${target.name}');
+        await playEpisode(
+          flagIndex.value,
+          episodeIndex.value,
+          inheritPosition: inherit,
         );
       },
     );
@@ -561,6 +1127,7 @@ class VodIntroController extends CommonIntroController {
 
   @override
   void onClose() {
+    _startPlayRun();
     videoDetailCtr.plPlayerController.removePositionListener(onPositionChanged);
     saveRecord();
     super.onClose();
@@ -570,8 +1137,9 @@ class VodIntroController extends CommonIntroController {
   static Future<LoadingState<VodPlayInfo>> _resolve(
     ApiConfig? cfg,
     VodPlayInfo info,
-    String flag,
-  ) async {
+    String flag, {
+    CancelToken? cancelToken,
+  }) async {
     final prefix = info.parsePrefix?.trim() ?? '';
 
     if (!info.parse) {
@@ -586,7 +1154,7 @@ class VodIntroController extends CommonIntroController {
           .where((item) => item.name == defaultParse)
           .firstOrNull;
       if (parse != null) {
-        return _applyParse(parse, info, headers);
+        return _applyParse(parse, info, headers, cancelToken: cancelToken);
       }
     }
 
@@ -598,11 +1166,16 @@ class VodIntroController extends CommonIntroController {
         return const Error('未配置可用解析');
       }
       await ControlManager.instance.ensureServer();
-      return SuperParse.resolve(cfg, info, flag);
+      return SuperParse.resolve(cfg, info, flag, cancelToken: cancelToken);
     }
 
     if (prefix.startsWith('json:')) {
-      return _jsonParse(prefix.substring(5), info, headers);
+      return _jsonParse(
+        prefix.substring(5),
+        info,
+        headers,
+        cancelToken: cancelToken,
+      );
     }
     if (prefix.startsWith('parse:')) {
       final name = prefix.substring(6);
@@ -612,7 +1185,7 @@ class VodIntroController extends CommonIntroController {
       if (parse == null) {
         return const Error('未找到指定解析');
       }
-      return _applyParse(parse, info, headers);
+      return _applyParse(parse, info, headers, cancelToken: cancelToken);
     }
     if (prefix.isNotEmpty) {
       return Success(
@@ -632,11 +1205,12 @@ class VodIntroController extends CommonIntroController {
   static Future<LoadingState<VodPlayInfo>> _applyParse(
     ParseBean parse,
     VodPlayInfo info,
-    Map<String, String> headers,
-  ) async {
+    Map<String, String> headers, {
+    CancelToken? cancelToken,
+  }) async {
     final merged = <String, String>{...headers, ...parse.headers};
     if (parse.type == 1) {
-      return _jsonParse(parse.url, info, merged);
+      return _jsonParse(parse.url, info, merged, cancelToken: cancelToken);
     }
     return Success(
       info.copyWith(
@@ -650,8 +1224,9 @@ class VodIntroController extends CommonIntroController {
   static Future<LoadingState<VodPlayInfo>> _jsonParse(
     String parseUrl,
     VodPlayInfo info,
-    Map<String, String> headers,
-  ) async {
+    Map<String, String> headers, {
+    CancelToken? cancelToken,
+  }) async {
     final requestUrl = '$parseUrl${StringUtils.javaUrlEncode(info.url)}';
     final data = await Http.string(
       requestUrl,
@@ -661,6 +1236,7 @@ class VodIntroController extends CommonIntroController {
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
       ),
+      cancelToken: cancelToken,
     );
     if (data == null) {
       debugPrint('[tvbox] jsonParse failed url=$requestUrl');

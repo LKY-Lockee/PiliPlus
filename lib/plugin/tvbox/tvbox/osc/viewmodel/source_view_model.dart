@@ -176,7 +176,7 @@ class SourceViewModel {
   }
 
   /// com.github.tvbox.osc.viewmodel.SourceViewModel.getFixUrl
-  Future<String> _getExtend() async {
+  Future<String> _getExtend({CancelToken? cancelToken}) async {
     final ext = source?.ext ?? '';
     if (!ext.startsWith('http')) {
       return ext;
@@ -190,6 +190,7 @@ class SourceViewModel {
     final data = await Http.string(
       ext,
       options: Options(responseType: ResponseType.plain),
+      cancelToken: cancelToken,
     );
     if (data != null) {
       String minified;
@@ -201,8 +202,8 @@ class SourceViewModel {
       if (minified.length <= 2500) {
         result = minified;
       }
+      _extendCache[cacheKey] = result;
     }
-    _extendCache[cacheKey] = result;
     return result;
   }
 
@@ -210,6 +211,7 @@ class SourceViewModel {
     String url, {
     Map<String, dynamic>? queryParameters,
     int? timeoutSeconds,
+    CancelToken? cancelToken,
   }) async {
     final data = await Http.string(
       url,
@@ -220,6 +222,7 @@ class SourceViewModel {
           seconds: timeoutSeconds ?? source?.playTimeoutSeconds ?? 15,
         ),
       ),
+      cancelToken: cancelToken,
     );
     return _asMap(data);
   }
@@ -555,7 +558,11 @@ class SourceViewModel {
   }
 
   /// com.github.tvbox.osc.viewmodel.SourceViewModel.getPlay
-  Future<LoadingState<VodPlayInfo>> getPlay(String flag, String url) async {
+  Future<LoadingState<VodPlayInfo>> getPlay(
+    String flag,
+    String url, {
+    CancelToken? cancelToken,
+  }) async {
     final bean = source;
     if (bean == null) {
       return const Error('未配置点播源');
@@ -593,7 +600,7 @@ class SourceViewModel {
           return Error('请求播放数据失败: $e');
         }
       case 4:
-        final extend = await _getExtend();
+        final extend = await _getExtend(cancelToken: cancelToken);
         final json = await _getJson(
           bean.api,
           queryParameters: {
@@ -601,6 +608,7 @@ class SourceViewModel {
             'flag': flag,
             if (extend.isNotEmpty) 'extend': extend,
           },
+          cancelToken: cancelToken,
         );
         if (json == null) {
           return const Error('请求播放数据失败');

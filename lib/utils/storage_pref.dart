@@ -365,6 +365,24 @@ abstract final class Pref {
   static set setVodAdRemoveToast(bool value) =>
       _setting.put(SettingBoxKey.vodAdRemoveToast, value);
 
+  static bool get vodAutoChangeSource =>
+      _setting.get(SettingBoxKey.vodAutoChangeSource, defaultValue: true);
+
+  static set setVodAutoChangeSource(bool value) =>
+      _setting.put(SettingBoxKey.vodAutoChangeSource, value);
+
+  static int get vodAutoChangeSourceRetry =>
+      _setting.get(SettingBoxKey.vodAutoChangeSourceRetry, defaultValue: 0);
+
+  static bool get vodAutoSwitchLine =>
+      _setting.get(SettingBoxKey.vodAutoSwitchLine, defaultValue: true);
+
+  static set setVodAutoSwitchLine(bool value) =>
+      _setting.put(SettingBoxKey.vodAutoSwitchLine, value);
+
+  static int get vodAutoSwitchLineRetry =>
+      _setting.get(SettingBoxKey.vodAutoSwitchLineRetry, defaultValue: 3);
+
   static Future<void> clearVodEnabledSites() =>
       _setting.delete(SettingBoxKey.vodEnabledSites);
 

@@ -57,6 +57,11 @@ class _VodSnifferPageState extends State<VodSnifferPage> {
       _countdown.value--;
       if (_countdown.value <= 0) {
         timer.cancel();
+        if (!isDone.value &&
+            mounted &&
+            ModalRoute.of(context)?.isCurrent == true) {
+          Get.back();
+        }
       }
     });
   }

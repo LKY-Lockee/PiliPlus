@@ -1,5 +1,8 @@
 import 'package:PiliPlus/pages/setting/models/model.dart';
+import 'package:PiliPlus/pages/setting/widgets/slider_dialog.dart';
+import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -30,4 +33,78 @@ List<SettingsModel> get vodSettings => [
     defaultVal: true,
     leading: Icon(Icons.notifications_active_outlined),
   ),
+  const SwitchModel(
+    title: '自动换源',
+    subtitle: '当前源所有线路不可用时自动切换到其它同名源',
+    setKey: SettingBoxKey.vodAutoChangeSource,
+    defaultVal: true,
+    leading: Icon(Icons.source_outlined),
+  ),
+  const NormalModel(
+    title: '自动换源重试上限',
+    subtitle: '为0时尝试所有可用源',
+    leading: Icon(Icons.hub_outlined),
+    onTap: _showAutoChangeSourceRetryDialog,
+  ),
+  const SwitchModel(
+    title: '自动换线',
+    subtitle: '播放失败时自动切换到下一条线路',
+    setKey: SettingBoxKey.vodAutoSwitchLine,
+    defaultVal: true,
+    leading: Icon(Icons.swap_horiz_outlined),
+  ),
+  const NormalModel(
+    title: '自动换线重试上限',
+    subtitle: '为0时无限重试',
+    leading: Icon(Icons.loop_outlined),
+    onTap: _showAutoSwitchRetryDialog,
+  ),
 ];
+
+Future<void> _showAutoChangeSourceRetryDialog(
+  BuildContext context,
+  VoidCallback setState,
+) async {
+  final res = await showDialog<double>(
+    context: context,
+    builder: (context) => SliderDialog(
+      title: const Text('自动换源重试上限'),
+      min: 0,
+      max: 8,
+      divisions: 8,
+      precise: 0,
+      value: Pref.vodAutoChangeSourceRetry.toDouble(),
+    ),
+  );
+  if (res != null) {
+    await GStorage.setting.put(
+      SettingBoxKey.vodAutoChangeSourceRetry,
+      res.toInt(),
+    );
+    setState();
+  }
+}
+
+Future<void> _showAutoSwitchRetryDialog(
+  BuildContext context,
+  VoidCallback setState,
+) async {
+  final res = await showDialog<double>(
+    context: context,
+    builder: (context) => SliderDialog(
+      title: const Text('自动换线重试上限'),
+      min: 0,
+      max: 8,
+      divisions: 8,
+      precise: 0,
+      value: Pref.vodAutoSwitchLineRetry.toDouble(),
+    ),
+  );
+  if (res != null) {
+    await GStorage.setting.put(
+      SettingBoxKey.vodAutoSwitchLineRetry,
+      res.toInt(),
+    );
+    setState();
+  }
+}
