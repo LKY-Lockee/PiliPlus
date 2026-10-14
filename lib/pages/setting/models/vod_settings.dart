@@ -1,5 +1,8 @@
 import 'package:PiliPlus/pages/setting/models/model.dart';
+import 'package:PiliPlus/pages/setting/widgets/select_dialog.dart';
 import 'package:PiliPlus/pages/setting/widgets/slider_dialog.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/net/doh.dart';
+import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
@@ -38,12 +41,12 @@ List<SettingsModel> get vodSettings => [
     subtitle: '当前源所有线路不可用时自动切换到其它同名源',
     setKey: SettingBoxKey.vodAutoChangeSource,
     defaultVal: true,
-    leading: Icon(Icons.source_outlined),
+    leading: Icon(Icons.swap_horiz_outlined),
   ),
   const NormalModel(
     title: '自动换源重试上限',
     subtitle: '为0时尝试所有可用源',
-    leading: Icon(Icons.hub_outlined),
+    leading: Icon(Icons.loop_outlined),
     onTap: _showAutoChangeSourceRetryDialog,
   ),
   const SwitchModel(
@@ -59,7 +62,37 @@ List<SettingsModel> get vodSettings => [
     leading: Icon(Icons.loop_outlined),
     onTap: _showAutoSwitchRetryDialog,
   ),
+  NormalModel(
+    title: '安全DNS',
+    getSubtitle: () {
+      final names = Doh.names;
+      final index = Pref.vodDohUrl;
+      return index >= 0 && index < names.length ? names[index] : '关闭';
+    },
+    leading: const Icon(Icons.security_outlined),
+    onTap: _showDohDialog,
+  ),
 ];
+
+Future<void> _showDohDialog(
+  BuildContext context,
+  VoidCallback setState,
+) async {
+  final names = Doh.names;
+  final res = await showDialog<int>(
+    context: context,
+    builder: (context) => SelectDialog<int>(
+      title: '请选择安全DNS',
+      value: Pref.vodDohUrl,
+      values: [for (var i = 0; i < names.length; i++) (i, names[i])],
+    ),
+  );
+  if (res != null && res != Pref.vodDohUrl) {
+    Pref.setVodDohUrl = res;
+    TVBoxHttpHelper.reloadDns();
+    setState();
+  }
+}
 
 Future<void> _showAutoChangeSourceRetryDialog(
   BuildContext context,

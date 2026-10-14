@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:PiliPlus/plugin/tvbox/catvod/net/dns.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/net/doh.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/net/http.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:dio/dio.dart';
@@ -32,6 +33,7 @@ class TVBoxHttpHelper {
           ..connectionFactory = Dns.connect,
       )
       ..options.validateStatus = (status) => status != null;
+    reloadDns();
   }
 
   static void updateUserAgent(String userAgent) {
@@ -41,5 +43,11 @@ class TVBoxHttpHelper {
   /// com.github.tvbox.osc.util.OkGoHelper.setDnsList
   static void setDnsList(Map<String, String> hosts) {
     Dns.addAll(hosts);
+  }
+
+  /// com.github.tvbox.osc.util.OkGoHelper.reloadDns
+  static void reloadDns() {
+    Doh.setList(Pref.vodDohList);
+    Doh.select(Pref.vodDohUrl);
   }
 }

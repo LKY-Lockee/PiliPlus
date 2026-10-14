@@ -228,7 +228,9 @@ abstract final class SettingBoxKey {
       vodAutoChangeSource = 'vodAutoChangeSource',
       vodAutoChangeSourceRetry = 'vodAutoChangeSourceRetry',
       vodAutoSwitchLine = 'vodAutoSwitchLine',
-      vodAutoSwitchLineRetry = 'vodAutoSwitchLineRetry';
+      vodAutoSwitchLineRetry = 'vodAutoSwitchLineRetry',
+      vodDohList = 'vodDohList',
+      vodDohUrl = 'vodDohUrl';
 
   static const String themeMode = 'themeMode',
       defaultTextScale = 'textScale',

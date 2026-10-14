@@ -1,6 +1,7 @@
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/api/api_config.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
+import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/search_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/viewmodel/source_view_model.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
@@ -75,6 +76,9 @@ class TVBoxService extends GetxService {
     if (Pref.vodDefaultParse.isNotEmpty) {
       Pref.setVodDefaultParse = '';
     }
+    Pref.setVodDohList = '';
+    Pref.setVodDohUrl = 0;
+    TVBoxHttpHelper.reloadDns();
     await Pref.clearVodEnabledSites();
   }
 

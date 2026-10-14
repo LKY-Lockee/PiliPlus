@@ -383,6 +383,18 @@ abstract final class Pref {
   static int get vodAutoSwitchLineRetry =>
       _setting.get(SettingBoxKey.vodAutoSwitchLineRetry, defaultValue: 3);
 
+  static String get vodDohList =>
+      _setting.get(SettingBoxKey.vodDohList, defaultValue: '');
+
+  static set setVodDohList(String value) =>
+      _setting.put(SettingBoxKey.vodDohList, value);
+
+  static int get vodDohUrl =>
+      _setting.get(SettingBoxKey.vodDohUrl, defaultValue: 0);
+
+  static set setVodDohUrl(int value) =>
+      _setting.put(SettingBoxKey.vodDohUrl, value);
+
   static Future<void> clearVodEnabledSites() =>
       _setting.delete(SettingBoxKey.vodEnabledSites);
 

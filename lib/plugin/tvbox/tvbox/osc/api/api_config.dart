@@ -104,6 +104,17 @@ class ApiConfig {
       _parseRules(json['rules']);
       _parseAdHosts(json['ads']);
       TVBoxHttpHelper.setDnsList(config.myHosts);
+      final dohJson = json['doh'];
+      if (dohJson != null) {
+        final text = jsonEncode(dohJson);
+        if (Pref.vodDohList != text) {
+          Pref.setVodDohUrl = 0;
+          Pref.setVodDohList = text;
+        }
+      } else {
+        Pref.setVodDohList = '';
+      }
+      TVBoxHttpHelper.reloadDns();
       return config;
     } catch (_) {
       return null;
@@ -197,6 +208,7 @@ class ApiConfig {
     VideoParseRuler.clearRule();
     AdBlocker.reset();
     TVBoxHttpHelper.setDnsList(const {});
+    TVBoxHttpHelper.reloadDns();
   }
 
   static String cacheKey(String url) =>
@@ -276,6 +288,8 @@ class ApiConfig {
   static Future<LoadingState<ApiConfig>> load({bool useCache = false}) async {
     var url = Pref.vodConfigUrl;
     if (url.isEmpty) {
+      Pref.setVodDohList = '';
+      Pref.setVodDohUrl = 0;
       _clearRuntimeConfig();
       return const Error('未配置点播订阅');
     }

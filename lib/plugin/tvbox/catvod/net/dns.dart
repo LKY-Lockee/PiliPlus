@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:PiliPlus/plugin/tvbox/catvod/net/doh.dart';
+
 /// com.github.catvod.net.OkDns
 class Dns {
   /// com.github.tvbox.osc.util.OkGoHelper.myHosts
@@ -47,16 +49,32 @@ class Dns {
     int? proxyPort,
   ) async {
     final target = _hosts[uri.host];
-    if (target == null || target.isEmpty) {
-      return uri.scheme == 'https'
-          ? SecureSocket.startConnect(
-              uri.host,
-              uri.port,
-              onBadCertificate: (_) => true,
-            )
-          : Socket.startConnect(uri.host, uri.port);
+    if (target != null && target.isNotEmpty) {
+      final (host, port) = parseTarget(target, uri.port);
+      return _connectMapped(uri, host, port);
     }
-    final (host, port) = parseTarget(target, uri.port);
+    final ips = await Doh.resolve(uri.host);
+    if (ips != null) {
+      for (final ip in ips) {
+        try {
+          return await _connectMapped(uri, ip, uri.port);
+        } catch (_) {}
+      }
+    }
+    return uri.scheme == 'https'
+        ? SecureSocket.startConnect(
+            uri.host,
+            uri.port,
+            onBadCertificate: (_) => true,
+          )
+        : Socket.startConnect(uri.host, uri.port);
+  }
+
+  static Future<ConnectionTask<Socket>> _connectMapped(
+    Uri uri,
+    String host,
+    int port,
+  ) async {
     if (uri.scheme != 'https') {
       return Socket.startConnect(host, port);
     }
