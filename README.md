@@ -1,20 +1,17 @@
 <div align="center">
     <img width="200" height="200" src="assets/images/logo/logo.png">
+    <h1>PiliPlus</h1>
 </div>
 
-
-
-<div align="center">
-    <h1>PiliPlus</h1>
 <div align="center">
 
 中文 | [English](README.en.md)
 
-![GitHub repo size](https://img.shields.io/github/repo-size/bggRGjQaUbCoE/PiliPlus) 
-![GitHub Repo stars](https://img.shields.io/github/stars/bggRGjQaUbCoE/PiliPlus) 
-![GitHub all releases](https://img.shields.io/github/downloads/bggRGjQaUbCoE/PiliPlus/total) 
-</div>
-    <p>使用Flutter开发的BiliBili第三方客户端</p>
+![GitHub repo size](https://img.shields.io/github/repo-size/LKY-Lockee/PiliPlus?label=Repo%20Size)
+![GitHub Repo stars](https://img.shields.io/github/stars/LKY-Lockee/PiliPlus)
+![GitHub all releases](https://img.shields.io/github/downloads/LKY-Lockee/PiliPlus/total?label=Downloads)
+
+<p>使用Flutter开发的BiliBili第三方客户端</p>
     
 <img src="assets/screenshots/510shots_so.png" width="32%" alt="home" />
 <img src="assets/screenshots/174shots_so.png" width="32%" alt="home" />
@@ -23,7 +20,6 @@
 <img src="assets/screenshots/main_screen.png" width="96%" alt="home" />
 <br/>
 </div>
-
 
 <br/>
 
@@ -37,13 +33,13 @@
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/piliplus.svg)](https://repology.org/project/piliplus/versions)
 
-## refactor
+## 重构
 
 - [ ] gRPC [wip]
 - [x] 用户界面
 - [x] 其他
 
-## feat
+## 特性
 
 - [x] 编辑动态
 - [x] DLNA 投屏
@@ -119,7 +115,7 @@
 - [x] 删除/发布/置顶文本/图片动态
 - [x] 其他
 
-## opt
+## 优化
 
 - [x] 专栏界面
 - [x] 私信界面
@@ -135,12 +131,10 @@
 - [x] 防止bottomsheet遮挡全屏视频
 - [x] 其他
 
-## fix
+## 修复
 
 - [x] 番剧分集点赞/投币/收藏
 - [x] bugs
-
-<br/>
 
 ## 功能
 
@@ -153,71 +147,71 @@
 - [x] 游客模式（推荐视为未登录）
 
 - [x] 用户相关
-  - [x] 粉丝、关注用户、拉黑用户查看
-  - [x] 用户主页查看
-  - [x] 关注/取关用户
-  - [x] 离线缓存
-  - [x] 稍后再看
-  - [x] 观看记录
-  - [x] 我的收藏
-  - [x] 站内私信
-  
+    - [x] 粉丝、关注用户、拉黑用户查看
+    - [x] 用户主页查看
+    - [x] 关注/取关用户
+    - [x] 离线缓存
+    - [x] 稍后再看
+    - [x] 观看记录
+    - [x] 我的收藏
+    - [x] 站内私信
+
 - [x] 动态相关
-  - [x] 全部、投稿、番剧分类查看
-  - [x] 动态评论查看
-  - [x] 动态评论回复功能
+    - [x] 全部、投稿、番剧分类查看
+    - [x] 动态评论查看
+    - [x] 动态评论回复功能
 
 - [x] 视频播放相关
-  - [x] 双击快进/快退
-  - [x] 双击播放/暂停
-  - [x] 垂直方向调节亮度/音量
-  - [x] 垂直方向上滑全屏、下滑退出全屏
-  - [x] 水平方向手势快进/快退
-  - [x] 全屏方向设置
-  - [x] 倍速选择/长按2倍速
-  - [x] 硬件加速（视机型而定）
-  - [x] 画质选择（高清画质未解锁）
-  - [x] 音质选择（视视频而定）
-  - [x] 解码格式选择（视视频而定）
-  - [x] 弹幕
-  - [x] 字幕
-  - [x] 记忆播放
-  - [x] 视频比例：高度/宽度适应、填充、包含等
-     
+    - [x] 双击快进/快退
+    - [x] 双击播放/暂停
+    - [x] 垂直方向调节亮度/音量
+    - [x] 垂直方向上滑全屏、下滑退出全屏
+    - [x] 水平方向手势快进/快退
+    - [x] 全屏方向设置
+    - [x] 倍速选择/长按2倍速
+    - [x] 硬件加速（视机型而定）
+    - [x] 画质选择（高清画质未解锁）
+    - [x] 音质选择（视视频而定）
+    - [x] 解码格式选择（视视频而定）
+    - [x] 弹幕
+    - [x] 字幕
+    - [x] 记忆播放
+    - [x] 视频比例：高度/宽度适应、填充、包含等
+
 - [x] 搜索相关
-  - [x] 热搜
-  - [x] 搜索历史
-  - [x] 默认搜索词
-  - [x] 投稿、番剧、直播间、用户搜索
-  - [x] 视频搜索排序、按时长筛选
-    
+    - [x] 热搜
+    - [x] 搜索历史
+    - [x] 默认搜索词
+    - [x] 投稿、番剧、直播间、用户搜索
+    - [x] 视频搜索排序、按时长筛选
+
 - [x] 视频详情页相关
-  - [x] 视频选集(分p)切换
-  - [x] 点赞、投币、收藏/取消收藏
-  - [x] 相关视频查看
-  - [x] 评论用户身份标识
-  - [x] 评论(排序)查看、二楼评论查看
-  - [x] 主楼、二楼评论回复功能
-  - [x] 评论点赞
-  - [x] 评论笔记图片查看、保存
+    - [x] 视频选集(分p)切换
+    - [x] 点赞、投币、收藏/取消收藏
+    - [x] 相关视频查看
+    - [x] 评论用户身份标识
+    - [x] 评论(排序)查看、二楼评论查看
+    - [x] 主楼、二楼评论回复功能
+    - [x] 评论点赞
+    - [x] 评论笔记图片查看、保存
 
 - [x] 设置相关
-  - [x] 画质、音质、解码方式预设      
-  - [x] 图片质量设定
-  - [x] 主题模式：亮色/暗色/跟随系统
-  - [x] 震动反馈(可选)
-  - [x] 高帧率
-  - [x] 自动全屏
-  - [x] 横屏适配
-- [ ] 等等
+    - [x] 画质、音质、解码方式预设
+    - [x] 图片质量设定
+    - [x] 主题模式：亮色/暗色/跟随系统
+    - [x] 震动反馈(可选)
+    - [x] 高帧率
+    - [x] 自动全屏
+    - [x] 横屏适配
 
-<br/>
+- [x] 特色功能
+    - [x] `TVBox`集成
+
+- [ ] 等等
 
 ## 下载
 
-可以从 [Releases](https://github.com/bggRGjQaUbCoE/PiliPlus/releases) 下载，或克隆仓库拉取代码后在本地编译。
-
-<br/>
+可以从 [Releases](https://github.com/LKY-Lockee/PiliPlus/releases) 下载，或克隆仓库拉取代码后在本地编译。
 
 ## 声明
 
@@ -225,12 +219,10 @@
 所用API皆从官方网站收集，不提供任何破解内容。
 在此致敬原作者：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
 在此致敬上游作者：[orz12/PiliPalaX](https://github.com/orz12/PiliPalaX)
-本仓库做了更激进的修改，感谢原作者的开源精神。
+在此感谢上游作者：[bggRGjQaUbCoE/PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus)
+本仓库添加了额外的功能，感谢原作者的开源精神。
 
 感谢使用
-
-
-<br/>
 
 ## 致谢
 
@@ -238,18 +230,15 @@
 - [flutter_meedu_videoplayer](https://github.com/zezo357/flutter_meedu_videoplayer)
 - [media-kit](https://github.com/media-kit/media-kit)
 - [dio](https://pub.dev/packages/dio)
+- [TVBox](https://github.com/q215613905/TVBoxOS)
 - 等等
 
-<br/>
-<br/>
-<br/>
+<!-- ## Star History
 
-## Star History
-
-<a href="https://star-history.dera.page/#bggRGjQaUbCoE/PiliPlus&Date">
+<a href="https://star-history.dera.page/#LKY-Lockee/PiliPlus&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date" />
-   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=LKY-Lockee/PiliPlus&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=LKY-Lockee/PiliPlus&type=Date" />
+   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=LKY-Lockee/PiliPlus&type=Date" />
  </picture>
-</a>
+</a> -->

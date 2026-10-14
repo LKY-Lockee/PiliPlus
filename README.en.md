@@ -7,14 +7,11 @@
 
 [中文](README.md) | English
 
-![GitHub repo size](https://img.shields.io/github/repo-size/bggRGjQaUbCoE/PiliPlus)
-![GitHub Repo stars](https://img.shields.io/github/stars/bggRGjQaUbCoE/PiliPlus)
-![GitHub all releases](https://img.shields.io/github/downloads/bggRGjQaUbCoE/PiliPlus/total)
+![GitHub repo size](https://img.shields.io/github/repo-size/LKY-Lockee/PiliPlus?label=Repo%20Size)
+![GitHub Repo stars](https://img.shields.io/github/stars/LKY-Lockee/PiliPlus)
+![GitHub all releases](https://img.shields.io/github/downloads/LKY-Lockee/PiliPlus/total?label=Downloads)
 
-</div>
-
-<div align="center">
-    <p>A third-party Bilibili client built with Flutter</p>
+<p>A third-party Bilibili client built with Flutter</p>
 
 <img src="assets/screenshots/510shots_so.png" width="32%" alt="PiliPlus mobile screenshot" />
 <img src="assets/screenshots/174shots_so.png" width="32%" alt="PiliPlus mobile screenshot" />
@@ -28,7 +25,7 @@
 
 ## Download
 
-Download a build from [Releases](https://github.com/bggRGjQaUbCoE/PiliPlus/releases), or clone the repository and build it locally.
+Download a build from [Releases](https://github.com/LKY-Lockee/PiliPlus/releases), or clone the repository and build it locally.
 
 ## Disclaimer
 
@@ -37,7 +34,8 @@ All APIs used were collected from the official website. This project does not pr
 
 Credit to the original project: [guozhigq/pilipala](https://github.com/guozhigq/pilipala).
 Credit to the upstream project: [orz12/PiliPalaX](https://github.com/orz12/PiliPalaX).
-This repository makes more extensive changes. Thank you to the original authors for sharing their work as open source.
+Credit to the upstream project: [bggRGjQaUbCoE/PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus).
+This repository adds more extra features. Thank you to the original authors for sharing their work as open source.
 
 Thank you for using PiliPlus.
 
@@ -47,14 +45,15 @@ Thank you for using PiliPlus.
 - [flutter_meedu_videoplayer](https://github.com/zezo357/flutter_meedu_videoplayer)
 - [media-kit](https://github.com/media-kit/media-kit)
 - [dio](https://pub.dev/packages/dio)
+- [TVBox](https://github.com/q215613905/TVBoxOS)
 - And others
 
-## Star History
+<!-- ## Star History
 
-<a href="https://star-history.dera.page/#bggRGjQaUbCoE/PiliPlus&Date">
+<a href="https://star-history.dera.page/#LKY-Lockee/PiliPlus&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date" />
-   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=LKY-Lockee/PiliPlus&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=LKY-Lockee/PiliPlus&type=Date" />
+   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=LKY-Lockee/PiliPlus&type=Date" />
  </picture>
-</a>
+</a> -->
