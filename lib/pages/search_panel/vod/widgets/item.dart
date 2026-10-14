@@ -16,6 +16,8 @@ class SearchVodItem extends StatelessWidget {
 
   final VodVideo item;
 
+  void onLongPress() => showPgcCover(title: item.title, cover: item.cover);
+
   @override
   Widget build(BuildContext context) {
     final sourceName = TVBoxService.to.config?.getSource(item.sourceKey)?.name;
@@ -28,10 +30,6 @@ class SearchVodItem extends StatelessWidget {
       item.type,
       item.remarks,
     ].where((e) => e != null && e.isNotEmpty).join(' · ');
-    void onLongPress() => imageSaveDialog(
-      title: item.title,
-      cover: item.cover,
-    );
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
@@ -46,7 +44,7 @@ class SearchVodItem extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: Style.safeSpace,
-            vertical: Style.cardSpace,
+            vertical: 5,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
