@@ -44,7 +44,6 @@ import 'package:PiliPlus/services/shutdown_timer_service.dart'
     show shutdownTimerService, ShutdownPanel;
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/connectivity_utils.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/string_ext.dart';
@@ -1957,9 +1956,7 @@ class HeaderControlState extends State<HeaderControl>
                       onPressed: () {
                         if (PlatformUtils.isDesktop) {
                           plPlayerController.toggleDesktopPip();
-                          return;
-                        }
-                        if (Platform.isIOS || AndroidHelper.isPipAvailable) {
+                        } else {
                           plPlayerController.enterPip();
                         }
                       },

@@ -20,12 +20,10 @@ class VodCardV extends StatelessWidget {
   final VoidCallback? onTap;
   final Map<String, String>? coverHeaders;
 
+  void onLongPress() => showPgcCover(title: item.title, cover: item.cover);
+
   @override
   Widget build(BuildContext context) {
-    void onLongPress() => imageSaveDialog(
-      title: item.title,
-      cover: item.cover,
-    );
     return Card(
       shape: const RoundedRectangleBorder(borderRadius: Style.mdRadius),
       child: InkWell(
@@ -44,7 +42,7 @@ class VodCardV extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AspectRatio(
-              aspectRatio: 0.75,
+              aspectRatio: Style.aspectRatio3x4,
               child: LayoutBuilder(
                 builder: (context, boxConstraints) {
                   final double maxWidth = boxConstraints.maxWidth;
