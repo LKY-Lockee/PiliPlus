@@ -85,7 +85,6 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
       return Future.value();
     }
     indexParams['source'] = source.key;
-    tvboxService.setHomeSource(source.key);
     scrollController.jumpToTop();
     conditionState.value = LoadingState.loading();
     return getVodIndexCondition();
