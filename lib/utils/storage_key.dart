@@ -220,7 +220,7 @@ abstract final class SettingBoxKey {
       vodUA = 'vodUA',
       vodDefaultParse = 'vodDefaultParse',
       vodDefaultSite = 'vodDefaultSite',
-      vodEnabledSites = 'vodEnabledSites',
+      vodDisabledSites = 'vodDisabledSites',
       vodHomeRec = 'vodHomeRec',
       vodM3u8Purify = 'vodM3u8Purify',
       vodWebAdBlock = 'vodWebAdBlock',

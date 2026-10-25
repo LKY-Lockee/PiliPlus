@@ -335,17 +335,12 @@ abstract final class Pref {
   static set setVodHomeRec(int value) =>
       _setting.put(SettingBoxKey.vodHomeRec, value);
 
-  static List<String> get vodEnabledSites => List<String>.from(
-    _setting.get(SettingBoxKey.vodEnabledSites, defaultValue: <String>[]),
+  static List<String> get vodDisabledSites => List<String>.from(
+    _setting.get(SettingBoxKey.vodDisabledSites, defaultValue: <String>[]),
   );
 
-  static set setVodEnabledSites(List<String> keys) =>
-      _setting.put(SettingBoxKey.vodEnabledSites, keys);
-
-  static bool get hasVodEnabledSites {
-    final value = _setting.get(SettingBoxKey.vodEnabledSites);
-    return value is List && value.isNotEmpty;
-  }
+  static set setVodDisabledSites(List<String> keys) =>
+      _setting.put(SettingBoxKey.vodDisabledSites, keys);
 
   static bool get vodM3u8Purify =>
       _setting.get(SettingBoxKey.vodM3u8Purify, defaultValue: true);
@@ -395,8 +390,8 @@ abstract final class Pref {
   static set setVodDohUrl(int value) =>
       _setting.put(SettingBoxKey.vodDohUrl, value);
 
-  static Future<void> clearVodEnabledSites() =>
-      _setting.delete(SettingBoxKey.vodEnabledSites);
+  static Future<void> clearVodDisabledSites() =>
+      _setting.delete(SettingBoxKey.vodDisabledSites);
 
   static DynamicsTabType get defaultDynamicType =>
       DynamicsTabType.values[defaultDynamicTypeIndex];

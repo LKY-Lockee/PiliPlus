@@ -95,7 +95,7 @@ class TVBoxService extends GetxService {
     Pref.setVodDohList = '';
     Pref.setVodDohUrl = 0;
     TVBoxHttpHelper.reloadDns();
-    await Pref.clearVodEnabledSites();
+    await Pref.clearVodDisabledSites();
   }
 
   Future<void> loadSources({bool useCache = false}) async {
@@ -111,14 +111,9 @@ class TVBoxService extends GetxService {
       final supportedSites = response.sourceBeanList.where(
         (site) => site.supported,
       );
-      if (!Pref.hasVodEnabledSites) {
-        Pref.setVodEnabledSites = supportedSites
-            .map((site) => site.key)
-            .toList();
-      }
-      final enabled = Pref.vodEnabledSites.toSet();
+      final disabled = Pref.vodDisabledSites.toSet();
       final enabledSites = supportedSites
-          .where((site) => enabled.contains(site.key))
+          .where((site) => !disabled.contains(site.key))
           .toList();
       sourcesState.value = Success(enabledSites);
       if (enabledSites.isEmpty) {

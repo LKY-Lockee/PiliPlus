@@ -27,13 +27,13 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
   List<SourceBean> sites = const [];
   ApiConfig? config;
   bool _loading = true;
-  late List<String> enabledKeys;
+  late Set<String> disabledKeys;
   late List<String> configUrls;
 
   @override
   void initState() {
     super.initState();
-    enabledKeys = List.of(Pref.vodEnabledSites);
+    disabledKeys = Pref.vodDisabledSites.toSet();
     configUrls = List.of(Pref.vodConfigUrls);
     if (Pref.vodConfigUrl.isNotEmpty &&
         !configUrls.contains(Pref.vodConfigUrl)) {
@@ -53,20 +53,11 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
       if (state is! Error) {
         config = TVBoxService.to.config;
         sites = config?.sourceBeanList ?? const [];
-        if (enabledKeys.isEmpty) {
-          enabledKeys = sites
-              .where((e) => e.supported)
-              .map((e) => e.key)
-              .toList();
-        } else {
-          enabledKeys.removeWhere(
-            (key) => !sites.any((e) => e.key == key && e.supported),
-          );
-        }
+        disabledKeys = Pref.vodDisabledSites.toSet();
       } else {
         config = null;
         sites = const [];
-        enabledKeys = List.of(Pref.vodEnabledSites);
+        disabledKeys = Pref.vodDisabledSites.toSet();
         SmartDialog.showToast(state.toString());
       }
     } finally {
@@ -109,8 +100,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
     if (result == true && url.trim().isNotEmpty) {
       final newUrl = url.trim();
       Pref.setVodConfigUrl = newUrl;
-      await Pref.clearVodEnabledSites();
-      enabledKeys.clear();
+      await Pref.clearVodDisabledSites();
       if (!configUrls.contains(newUrl)) {
         configUrls.insert(0, newUrl);
         Pref.setVodConfigUrls = configUrls;
@@ -190,8 +180,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
                         Get.back();
                         if (url != Pref.vodConfigUrl) {
                           Pref.setVodConfigUrl = url;
-                          await Pref.clearVodEnabledSites();
-                          enabledKeys.clear();
+                          await Pref.clearVodDisabledSites();
                           await _reload();
                         }
                       },
@@ -201,7 +190,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
                         Pref.setVodConfigUrls = configUrls;
                         if (url == Pref.vodConfigUrl) {
                           Pref.setVodConfigUrl = configUrls.firstOrNull ?? '';
-                          await Pref.clearVodEnabledSites();
+                          await Pref.clearVodDisabledSites();
                           await _reload();
                         } else {
                           setState(() {});
@@ -224,12 +213,10 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
       return;
     }
     setState(() {
-      if (enabledKeys.contains(site.key)) {
-        enabledKeys.remove(site.key);
-      } else {
-        enabledKeys.add(site.key);
+      if (!disabledKeys.remove(site.key)) {
+        disabledKeys.add(site.key);
       }
-      Pref.setVodEnabledSites = enabledKeys;
+      Pref.setVodDisabledSites = disabledKeys.toList();
     });
     await TVBoxService.to.loadSources(useCache: true);
   }
@@ -458,7 +445,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
             Padding(
               padding: const .fromLTRB(16, 12, 16, 4),
               child: Text(
-                '共${sites.length}个点播源，已启用${enabledKeys.length}个',
+                '共${sites.length}个点播源，已启用${sites.where((e) => e.supported && !disabledKeys.contains(e.key)).length}个',
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.outline,
                 ),
@@ -476,7 +463,8 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
               )
             else
               ...sites.map((site) {
-                final enabled = enabledKeys.contains(site.key);
+                final enabled =
+                    site.supported && !disabledKeys.contains(site.key);
                 return ListTile(
                   dense: true,
                   title: Text(
