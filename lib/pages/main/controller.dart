@@ -339,6 +339,14 @@ class MainController extends GetxController
     }
   }
 
+  Map<String, String>? get searchParameters {
+    if (hasHome &&
+        navigationBars[selectedIndex.value] == NavigationBarType.home) {
+      return {'initIndex': '${homeController.searchTypeIndex}'};
+    }
+    return null;
+  }
+
   bool refreshRecommendations() {
     if (navigationBars[selectedIndex.value] == NavigationBarType.home &&
         homeController.tabs[homeController.tabController.index] ==

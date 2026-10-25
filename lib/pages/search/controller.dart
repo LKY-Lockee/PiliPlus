@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:PiliPlus/common/widgets/dialog/dialog.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/search.dart';
+import 'package:PiliPlus/models/common/search/search_type.dart';
 import 'package:PiliPlus/models/search/suggest.dart';
 import 'package:PiliPlus/models_new/search/search_rcmd/data.dart';
 import 'package:PiliPlus/models_new/search/search_trending/data.dart';
@@ -122,6 +123,11 @@ class SSearchController extends GetxController
     final text = params['text'];
     if (text != null) {
       controller.text = text;
+    }
+
+    final index = int.tryParse(params['initIndex'] ?? '');
+    if (index != null && index >= 0 && index < SearchType.actives.length) {
+      initIndex = index;
     }
 
     if (searchSuggestion) {

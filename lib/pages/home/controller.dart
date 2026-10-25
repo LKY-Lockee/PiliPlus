@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:PiliPlus/http/api.dart';
 import 'package:PiliPlus/http/init.dart';
 import 'package:PiliPlus/models/common/home_tab_type.dart';
+import 'package:PiliPlus/models/common/search/search_type.dart';
 import 'package:PiliPlus/pages/common/common_controller.dart';
 import 'package:PiliPlus/pages/main/controller.dart';
 import 'package:PiliPlus/services/account_service.dart';
@@ -28,6 +29,17 @@ class HomeController extends GetxController
   late int lateCheckSearchAt = 0;
 
   ScrollOrRefreshMixin get controller => tabs[tabController.index].ctr();
+
+  int get searchTypeIndex {
+    final searchType = switch (tabs[tabController.index]) {
+      HomeTabType.bangumi => SearchType.media_bangumi,
+      HomeTabType.cinema => SearchType.media_ft,
+      HomeTabType.live => SearchType.live_room,
+      HomeTabType.vod => SearchType.vod,
+      HomeTabType.rcmd || HomeTabType.hot || HomeTabType.rank => SearchType.all,
+    };
+    return SearchType.actives.indexOf(searchType);
+  }
 
   @override
   ScrollController get scrollController => controller.scrollController;
