@@ -57,6 +57,7 @@ class JsModules {
     for (final name in builtinNames) {
       map[name] = await rootBundle.loadString('assets/js/lib/$name');
     }
+    map['template.js'] = map['模板.js']!;
     return _builtin = map;
   }
 
