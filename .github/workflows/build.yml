@@ -55,8 +55,8 @@ jobs:
         permissions: write-all
         env:
             SERIOUS_PYTHON_VERSION: "3.12"
-            SERIOUS_PYTHON_APP: build/pyapp
-            SERIOUS_PYTHON_SITE_PACKAGES: build/pysite
+            SERIOUS_PYTHON_APP: "${{ github.workspace }}/build/pyapp"
+            SERIOUS_PYTHON_SITE_PACKAGES: "${{ github.workspace }}/build/pysite"
             SERIOUS_PYTHON_ALLOW_SOURCE_DISTRIBUTIONS: jsonpath
 
         steps:

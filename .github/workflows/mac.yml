@@ -16,8 +16,8 @@ jobs:
     runs-on: macos-26
     env:
       SERIOUS_PYTHON_VERSION: "3.12"
-      SERIOUS_PYTHON_APP: build/pyapp
-      SERIOUS_PYTHON_SITE_PACKAGES: build/pysite
+      SERIOUS_PYTHON_APP: "${{ github.workspace }}/build/pyapp"
+      SERIOUS_PYTHON_SITE_PACKAGES: "${{ github.workspace }}/build/pysite"
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
