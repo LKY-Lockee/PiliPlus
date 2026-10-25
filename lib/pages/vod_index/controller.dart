@@ -18,7 +18,30 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
 
   RxMap<String, dynamic> indexParams = <String, dynamic>{}.obs;
 
+  int _conditionSeq = 0;
+
   List<SourceBean> get sources => tvboxService.sources;
+
+  Future<LoadingState<VodHomeData>> loadSort(SourceBean source) {
+    return SourceViewModel(
+      config: tvboxService.config!,
+      sourceKey: source.key,
+    ).getSort();
+  }
+
+  Future<LoadingState<VodListData>> loadList(
+    SourceBean source,
+    String categoryId,
+    int page,
+    Map<String, String> filters,
+  ) {
+    return SourceViewModel(
+      config: tvboxService.config!,
+      sourceKey: source.key,
+    ).getList(categoryId, page, filters);
+  }
+
+  bool _staleCondition(int seq) => isClosed || seq != _conditionSeq;
 
   VodHomeData? get _home => conditionState.value.dataOrNull;
 
@@ -45,8 +68,11 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
   }
 
   Future<void> getVodIndexCondition() async {
+    final seq = ++_conditionSeq;
+    conditionState.value = LoadingState.loading();
+    supersedePendingRequests();
     await tvboxService.getConfig();
-    if (isClosed) return;
+    if (_staleCondition(seq)) return;
     final allSources = sources;
     if (allSources.isEmpty) {
       conditionState.value = const Error('无可用点播源');
@@ -59,11 +85,8 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
         allSources.first;
     indexParams['source'] = source.key;
 
-    final res = await SourceViewModel(
-      config: tvboxService.config!,
-      sourceKey: source.key,
-    ).getSort();
-    if (isClosed) return;
+    final res = await loadSort(source);
+    if (_staleCondition(seq)) return;
     if (res case Success(:final response)) {
       if (response.categories.isEmpty) {
         conditionState.value = const Error('该源无分类');
@@ -75,7 +98,10 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
           indexParams.remove(key);
         }
       }
+      conditionState.value = res;
+      supersedePendingRequests();
       onReload();
+      return;
     }
     conditionState.value = res;
   }
@@ -85,6 +111,11 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
       return Future.value();
     }
     indexParams['source'] = source.key;
+    for (final key in indexParams.keys.toList()) {
+      if (key != 'source') {
+        indexParams.remove(key);
+      }
+    }
     scrollController.jumpToTop();
     conditionState.value = LoadingState.loading();
     return getVodIndexCondition();
@@ -97,6 +128,7 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
         indexParams.remove(key);
       }
     }
+    supersedePendingRequests();
     return super.onReload();
   }
 
@@ -106,6 +138,7 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
     } else {
       indexParams[key] = value;
     }
+    supersedePendingRequests();
     return super.onReload();
   }
 
@@ -116,10 +149,7 @@ class VodIndexController extends CommonListController<VodListData, VodVideo> {
     if (source == null || categoryId == null) {
       return Future.value(const Error('无可用分类'));
     }
-    return SourceViewModel(
-      config: tvboxService.config!,
-      sourceKey: source.key,
-    ).getList(categoryId, page, {
+    return loadList(source, categoryId, page, {
       for (final e in indexParams.entries)
         if (e.key != 'source' && e.key != 'category' && e.value != null)
           e.key: '${e.value}',

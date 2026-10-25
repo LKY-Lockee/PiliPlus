@@ -7,9 +7,16 @@ abstract class CommonListController<R, T> extends CommonController<R, T> {
   bool isEnd = false;
   bool? hasFooter;
 
+  int _requestSeq = 0;
+
   @override
   Rx<LoadingState<List<T>?>> loadingState =
       LoadingState<List<T>?>.loading().obs;
+
+  void supersedePendingRequests() {
+    _requestSeq++;
+    isLoading = false;
+  }
 
   void handleListResponse(List<T> dataList) {}
 
@@ -21,9 +28,11 @@ abstract class CommonListController<R, T> extends CommonController<R, T> {
 
   @override
   Future<void> queryData([bool isRefresh = true]) async {
-    if (isLoading || (!isRefresh && isEnd)) return;
+    if (isClosed || isLoading || (!isRefresh && isEnd)) return;
+    final requestSeq = _requestSeq;
     isLoading = true;
     final LoadingState<R> res = await customGetData();
+    if (isClosed || requestSeq != _requestSeq) return;
     if (res case Success(:final response)) {
       if (!customHandleResponse(isRefresh, res)) {
         final dataList = getDataList(response);
