@@ -7,37 +7,19 @@
         {
             "name": "PiliPlus",
             "request": "launch",
-            "type": "dart",
-            "env": {
-                "SERIOUS_PYTHON_VERSION": "3.12",
-                "SERIOUS_PYTHON_APP": "${workspaceFolder}/build/app",
-                "SERIOUS_PYTHON_SITE_PACKAGES": "${workspaceFolder}/build/site-packages"
-            },
-            "preLaunchTask": "Package Python"
+            "type": "dart"
         },
         {
             "name": "PiliPlus (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile",
-            "env": {
-                "SERIOUS_PYTHON_VERSION": "3.12",
-                "SERIOUS_PYTHON_APP": "${workspaceFolder}/build/app",
-                "SERIOUS_PYTHON_SITE_PACKAGES": "${workspaceFolder}/build/site-packages"
-            },
-            "preLaunchTask": "Package Python"
+            "flutterMode": "profile"
         },
         {
             "name": "PiliPlus (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release",
-            "env": {
-                "SERIOUS_PYTHON_VERSION": "3.12",
-                "SERIOUS_PYTHON_APP": "${workspaceFolder}/build/app",
-                "SERIOUS_PYTHON_SITE_PACKAGES": "${workspaceFolder}/build/site-packages"
-            },
-            "preLaunchTask": "Package Python"
+            "flutterMode": "release"
         }
     ]
 }

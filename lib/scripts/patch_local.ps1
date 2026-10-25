@@ -1,5 +1,6 @@
 ﻿param(
     [string]$platform,
+    [string]$DeviceId,
     [switch]$Restore
 )
 
@@ -34,6 +35,39 @@ function Reset-PubCache {
     Set-Location -LiteralPath $repo
     flutter pub get
     if ($LASTEXITCODE -ne 0) { throw 'flutter pub get failed' }
+}
+
+function Resolve-PlatformFromDevice {
+    param([string]$Id)
+
+    if (-not $Id) {
+        throw 'No device selected.'
+    }
+
+    $raw = (flutter devices --machine) -join "`n"
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Run ''flutter devices'' failed.'
+    }
+
+    $devices = $raw | ConvertFrom-Json
+    $device = $devices | Where-Object { $_.id -eq $Id } | Select-Object -First 1
+    if (-not $device) {
+        throw "Device '$Id' not found."
+    }
+
+    $targetPlatform = [string]$device.targetPlatform
+    $prefix = $targetPlatform.Split('-')[0]
+    $map = @{
+        'windows' = 'windows'
+        'android' = 'android'
+        'ios'     = 'ios'
+        'darwin'  = 'macos'
+        'linux'   = 'linux'
+    }
+    if (-not $map.ContainsKey($prefix)) {
+        throw "Platform '$targetPlatform' does not support patching."
+    }
+    return $map[$prefix]
 }
 
 try {
@@ -73,6 +107,10 @@ try {
         Reset-PubCache
         Write-Host 'Done'
         return
+    }
+
+    if (-not $platform) {
+        $platform = Resolve-PlatformFromDevice $DeviceId
     }
 
     $validPlatforms = 'windows', 'android', 'ios', 'linux', 'macos'

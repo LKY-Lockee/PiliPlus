@@ -2,6 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Patch",
+            "type": "shell",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 -DeviceId \"${command:flutter.getSelectedDeviceId}\"",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Restore SDK",
+            "type": "shell",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 -Restore",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Package Python",
             "type": "shell",
             "command": "python tool/package_python.py --device-id \"${command:flutter.getSelectedDeviceId}\"",
@@ -14,80 +32,6 @@
             "label": "Generate jni",
             "type": "shell",
             "command": "dart run tool/jnigen.dart",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Patch (Windows)",
-            "type": "shell",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 windows",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Patch (Android)",
-            "type": "shell",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 android",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Patch (iOS)",
-            "type": "shell",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 ios",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Patch (Linux)",
-            "type": "shell",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 linux",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Patch (MacOS)",
-            "type": "shell",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 macos",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Build (Windows Release)",
-            "type": "shell",
-            "command": "flutter build windows --release --no-pub",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "dependsOn": "patch (windows)",
-            "problemMatcher": []
-        },
-        {
-            "label": "Build (Android Release)",
-            "type": "shell",
-            "command": "flutter build apk --release --no-pub",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "dependsOn": "patch (android)",
-            "problemMatcher": []
-        },
-        {
-            "label": "Restore SDK",
-            "type": "shell",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 -Restore",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
