@@ -76,8 +76,8 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
     }
   }
 
-  Future<void> _showConfigUrlDialog() async {
-    String url = Pref.vodConfigUrl;
+  Future<void> _showConfigUrlDialog({String initialValue = ''}) async {
+    String url = initialValue;
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -398,7 +398,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            onTap: _showConfigUrlDialog,
+            onTap: () => _showConfigUrlDialog(initialValue: Pref.vodConfigUrl),
           ),
           ListTile(
             leading: const Icon(Icons.collections_bookmark_outlined),
