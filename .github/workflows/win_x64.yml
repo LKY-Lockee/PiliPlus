@@ -14,6 +14,10 @@ jobs:
   build-windows-app:
     name: Release Windows x64
     runs-on: windows-latest
+    env:
+      SERIOUS_PYTHON_VERSION: "3.12"
+      SERIOUS_PYTHON_APP: build/pyapp
+      SERIOUS_PYTHON_SITE_PACKAGES: build/pysite
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -43,6 +47,12 @@ jobs:
       - name: Apply Patch
         shell: pwsh
         run: lib/scripts/patch.ps1 windows
+
+      - name: Package Python
+        shell: pwsh
+        run: |
+          flutter pub get
+          dart run serious_python:main package lib/plugin/tvbox/pyramid -p Windows -r -r -r lib/plugin/tvbox/pyramid/requirements.txt
 
       - name: Build Windows
         run: |

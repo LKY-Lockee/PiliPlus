@@ -1338,10 +1338,10 @@ packages:
     dependency: transitive
     description:
       name: package_config
-      sha256: ffcf4cf3d6c0b74ac43708d9f56625506e8a68aa935abe9d267a7330f320eb5d
+      sha256: f096c55ebb7deb7e384101542bfba8c52696c1b56fca2eb62827989ef2353bbc
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "2.2.0"
   package_info_plus:
     dependency: "direct main"
     description:
@@ -1638,6 +1638,54 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
+  serious_python:
+    dependency: "direct main"
+    description:
+      name: serious_python
+      sha256: f270ca69aa486ccc910d969252d391e9fef8dbe08fdf4e6fb204237faaa4c3a1
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
+  serious_python_android:
+    dependency: transitive
+    description:
+      name: serious_python_android
+      sha256: "6e2302734a5173ae79f55b8bf344d19324f2aeb54c1df2fc8b7c0c6eb7f915e6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
+  serious_python_darwin:
+    dependency: transitive
+    description:
+      name: serious_python_darwin
+      sha256: c366d7b2dbecb3e8752ac96f8fb6514e9f0cc6841716fa46a8ebabdac544f7f8
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
+  serious_python_linux:
+    dependency: transitive
+    description:
+      name: serious_python_linux
+      sha256: c86033fa25955d06d1a50bef102c9a7e522e6b9a2bc439fbe22047e1ae49f61d
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
+  serious_python_platform_interface:
+    dependency: transitive
+    description:
+      name: serious_python_platform_interface
+      sha256: e419408d88e12e958518c9c44bc71ede1bae7856e6ca1d153665781400f2da7b
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
+  serious_python_windows:
+    dependency: transitive
+    description:
+      name: serious_python_windows
+      sha256: bfac4b7460221ad449b24b05332fda266495e52112bbe1ef236dbe89893f618e
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
   share_plus:
     dependency: "direct main"
     description:

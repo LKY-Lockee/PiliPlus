@@ -1,4 +1,5 @@
 import 'package:PiliPlus/http/loading_state.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/crawler/py_loader.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/api/api_config.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
@@ -24,6 +25,20 @@ class TVBoxService extends GetxService {
 
   static const int homeRecDouban = 0;
   static const int homeRecSite = 1;
+
+  static String _configSignature(ApiConfig config) {
+    final buffer = StringBuffer(config.url);
+    for (final site in config.sourceBeanList) {
+      buffer
+        ..write('\n')
+        ..write(site.key)
+        ..write('\u0001')
+        ..write(site.api)
+        ..write('\u0001')
+        ..write(site.ext);
+    }
+    return buffer.toString();
+  }
 
   List<SourceBean> get sources => sourcesState.value.dataOrNull ?? const [];
 
@@ -70,6 +85,7 @@ class TVBoxService extends GetxService {
   }
 
   Future<void> resetConfig() async {
+    await PyLoader.instance.clear();
     config = null;
     setHomeSource('');
     setHomeRec(homeRecDouban);
@@ -86,7 +102,12 @@ class TVBoxService extends GetxService {
     sourcesState.value = LoadingState.loading();
     final result = await ApiConfig.load(useCache: useCache);
     if (result case Success(:final response)) {
+      final previous = config;
       config = response;
+      if (previous != null &&
+          _configSignature(previous) != _configSignature(response)) {
+        await PyLoader.instance.clear();
+      }
       final supportedSites = response.sourceBeanList.where(
         (site) => site.supported,
       );

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js_loader.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/crawler/py_loader.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/spider.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/net/http.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/parse_bean.dart';
@@ -401,10 +402,28 @@ class ApiConfig {
   List<SourceBean> getSourceBeanList() => sourceBeanList;
 
   /// com.github.tvbox.osc.api.ApiConfig.getCSP
-  Future<Spider> getCSP(SourceBean bean) => JsLoader.instance.getSpider(
-    bean.key,
-    bean.api,
-    bean.ext,
-    timeoutSeconds: bean.playTimeoutSeconds,
-  );
+  Future<Spider> getCSP(SourceBean bean) {
+    if (bean.isJsSource) {
+      return JsLoader.instance.getSpider(
+        bean.key,
+        bean.api,
+        bean.ext,
+        timeoutSeconds: bean.playTimeoutSeconds,
+      );
+    }
+    if (bean.isPySource) {
+      return PyLoader.instance.getSpider(
+        bean.key,
+        bean.api,
+        bean.ext,
+        timeoutSeconds: bean.playTimeoutSeconds,
+      );
+    }
+    return JsLoader.instance.getSpider(
+      bean.key,
+      bean.api,
+      bean.ext,
+      timeoutSeconds: bean.playTimeoutSeconds,
+    );
+  }
 }

@@ -53,6 +53,11 @@ jobs:
         name: Release Android
         runs-on: ubuntu-latest
         permissions: write-all
+        env:
+            SERIOUS_PYTHON_VERSION: "3.12"
+            SERIOUS_PYTHON_APP: build/pyapp
+            SERIOUS_PYTHON_SITE_PACKAGES: build/pysite
+            SERIOUS_PYTHON_ALLOW_SOURCE_DISTRIBUTIONS: jsonpath
 
         steps:
             - name: 代码迁出
@@ -81,6 +86,11 @@ jobs:
             - name: Apply Patch
               shell: pwsh
               run: lib/scripts/patch.ps1 android
+
+            - name: Package Python
+              run: |
+                  flutter pub get
+                  dart run serious_python:main package lib/plugin/tvbox/pyramid -p Android -r -r -r lib/plugin/tvbox/pyramid/requirements.txt
 
             - name: Write key
               if: github.event_name == 'workflow_dispatch'

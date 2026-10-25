@@ -2,6 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Package Python",
+            "type": "shell",
+            "command": "python tool/package_python.py --device-id \"${command:flutter.getSelectedDeviceId}\"",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate jni",
+            "type": "shell",
+            "command": "dart run tool/jnigen.dart",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Patch (Windows)",
             "type": "shell",
             "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File lib/scripts/patch_local.ps1 windows",

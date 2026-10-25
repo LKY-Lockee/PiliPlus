@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/crypto.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/helper/js_worker.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/html_parser.dart';
-import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/js_spider.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/js_engine.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/rsa/rsa_encrypt.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_js/flutter_js.dart';
@@ -14,7 +14,7 @@ class Global {
   Global._();
 
   static Future<void> install(
-    JsSpider engine,
+    JsEngine engine,
     WorkerHost host,
   ) async {
     final rt = engine.requireRuntime();

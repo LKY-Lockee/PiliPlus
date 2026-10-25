@@ -49,8 +49,16 @@ class SourceBean {
 
   bool get jsEngineAvailable => !kIsWeb && !Platform.isIOS && !Platform.isMacOS;
 
+  bool get isPySource => type == 3 && api.contains('.py');
+
+  bool get pyEngineAvailable => !kIsWeb;
+
   bool get supported =>
-      type == 0 || type == 1 || type == 4 || (isJsSource && jsEngineAvailable);
+      type == 0 ||
+      type == 1 ||
+      type == 4 ||
+      (isJsSource && jsEngineAvailable) ||
+      (isPySource && pyEngineAvailable);
 
   /// com.github.tvbox.osc.bean.SourceBean.getPlayTimeoutSeconds
   int get playTimeoutSeconds {
@@ -99,7 +107,10 @@ class SourceBean {
           : jsonEncode(ext),
       searchable: json['searchable'] is! int || json['searchable'] == 1,
       quickSearch: json['quickSearch'] is! int || json['quickSearch'] == 1,
-      filterable: json['filterable'] is! int || json['filterable'] == 1,
+      filterable:
+          key.startsWith('py_') ||
+          json['filterable'] is! int ||
+          json['filterable'] == 1,
       changeable: json['changeable'] is! int || json['changeable'] == 1,
       playUrl: json['playUrl'] is String ? json['playUrl'] as String : '',
       timeout: json['timeout'] is int ? json['timeout'] as int : 0,

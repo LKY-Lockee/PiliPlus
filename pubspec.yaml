@@ -154,6 +154,7 @@ dependencies:
   saver_gallery: ^5.0.2
   screen_brightness_platform_interface: ^2.1.0
   screen_retriever: ^0.2.0
+  serious_python: 6.0.1
   share_plus: ^13.1.0
   stream_transform: ^2.1.1
   super_sliver_list:

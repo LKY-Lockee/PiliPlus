@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/helper/js_sync_slot.dart';
-import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/js_spider.dart';
+import 'package:PiliPlus/plugin/tvbox/catvod/crawler/js/js_engine.dart';
 import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 
 void tvboxJsWorker(Map<String, dynamic> init) {
@@ -13,7 +13,7 @@ void tvboxJsWorker(Map<String, dynamic> init) {
     init['proxyBase'] as String? ?? '',
     init['openccDataDir'] as String?,
   );
-  final engine = JsSpider(host);
+  final engine = JsEngine(host);
   final cmdPort = ReceivePort();
   toHost.send(<String, Object?>{'t': 'workerPort', 'port': cmdPort.sendPort});
   cmdPort.listen((msg) async {

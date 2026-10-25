@@ -12,7 +12,7 @@ class ControlManager {
   /// com.github.tvbox.osc.server.ControlManager.mServer
   HttpServer? _server;
 
-  ProxyInvoker? _proxyInvoker;
+  final Map<String, ProxyInvoker> _proxyInvokers = {};
 
   /// com.github.tvbox.osc.server.ControlManager.get
   static final ControlManager instance = ControlManager._();
@@ -71,28 +71,35 @@ class ControlManager {
         await _handleProxyM3u8(req);
         return;
       }
-      if (uri.path != '/proxy') {
+      final query = uri.queryParameters;
+      final isLegacyRoot = uri.path == '/' && query.containsKey('do');
+      if (uri.path != '/proxy' && !isLegacyRoot) {
         req.response.statusCode = 404;
         await req.response.close();
         return;
       }
-      final params = uri.queryParameters;
-      if (params['do'] != 'js') {
+      final params = Map<String, String>.from(query);
+      req.headers.forEach((name, values) {
+        if (values.isNotEmpty) {
+          params[name] = values.join(', ');
+        }
+      });
+      final invoker = _proxyInvokers[params['do'] ?? ''];
+      if (invoker == null) {
         req.response.statusCode = 404;
         await req.response.close();
         return;
       }
       final siteKey = params['siteKey'] ?? '';
-      if (siteKey.isEmpty || siteKey == 'undefined') {
+      if (params['do'] == 'js' && (siteKey.isEmpty || siteKey == 'undefined')) {
         req.response.statusCode = 400;
         req.response.write('missing siteKey');
         await req.response.close();
         return;
       }
-      final invoker = _proxyInvoker;
-      final result = invoker == null ? null : await invoker(params);
-      if (result is! List || result.isEmpty) {
-        req.response.statusCode = 502;
+      final result = await invoker(params);
+      if (result is! List || result.length < 3) {
+        req.response.statusCode = 500;
         req.response.write('proxy failed');
         await req.response.close();
         return;
@@ -136,8 +143,11 @@ class ControlManager {
   }
 
   /// com.github.tvbox.osc.server.ControlManager.startServer
-  Future<int> ensureServer({ProxyInvoker? onProxy}) async {
-    if (onProxy != null) _proxyInvoker = onProxy;
+  Future<int> ensureServer({
+    ProxyInvoker? onProxy,
+    String engine = 'js',
+  }) async {
+    if (onProxy != null) _proxyInvokers[engine] = onProxy;
     final server = _server;
     if (server != null) return server.port;
     final bound = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);

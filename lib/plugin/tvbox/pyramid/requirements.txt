@@ -1,0 +1,8 @@
+requests
+lxml
+ujson
+pyquery==2.0.2
+jsonpath
+cachetools
+pycryptodome
+beautifulsoup4
