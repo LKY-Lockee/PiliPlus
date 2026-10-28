@@ -1,7 +1,16 @@
+import 'package:PiliPlus/common/widgets/marquee.dart';
 import 'package:PiliPlus/models/common/badge_type.dart';
 import 'package:PiliPlus/utils/extension/string_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:material_ui/material_ui.dart';
+
+enum PBadgeAlignment {
+  left(Alignment.centerLeft),
+  right(Alignment.centerRight);
+
+  final Alignment alignment;
+  const PBadgeAlignment(this.alignment);
+}
 
 class PBadge extends StatelessWidget {
   final String? text;
@@ -19,6 +28,7 @@ class PBadge extends StatelessWidget {
   final double fontSize;
   final bool isBold;
   final double? textScaleFactor;
+  final PBadgeAlignment? alignment;
 
   const PBadge({
     super.key,
@@ -33,6 +43,7 @@ class PBadge extends StatelessWidget {
     this.fontSize = 11,
     this.isBold = true,
     this.textScaleFactor,
+    this.alignment,
     this.padding,
   });
 
@@ -94,8 +105,9 @@ class PBadge extends StatelessWidget {
         color: bgColor,
         border: .all(color: borderColor),
       ),
-      child: Text(
+      child: MarqueeText(
         text!,
+        spacing: 16,
         textScaler: textScaleFactor != null ? .linear(textScaleFactor!) : null,
         style: TextStyle(
           height: 1,
@@ -117,7 +129,9 @@ class PBadge extends StatelessWidget {
         left: left,
         right: right,
         bottom: bottom,
-        child: content,
+        child: alignment != null && left != null && right != null
+            ? Align(alignment: alignment!.alignment, child: content)
+            : content,
       );
     } else {
       return content;

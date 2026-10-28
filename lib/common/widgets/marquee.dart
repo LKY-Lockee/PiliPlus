@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 class MarqueeText extends StatelessWidget {
   final String text;
+  final TextScaler? textScaler;
   final TextStyle? style;
   final StrutStyle? strutStyle;
   final double spacing;
@@ -14,6 +15,7 @@ class MarqueeText extends StatelessWidget {
   const MarqueeText(
     this.text, {
     super.key,
+    this.textScaler,
     this.style,
     this.strutStyle,
     this.spacing = 0,
@@ -29,6 +31,7 @@ class MarqueeText extends StatelessWidget {
       provider: provider,
       child: Text(
         text,
+        textScaler: textScaler,
         style: style,
         strutStyle: strutStyle,
         maxLines: 1,
