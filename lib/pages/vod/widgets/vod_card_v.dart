@@ -59,9 +59,9 @@ class VodCardV extends StatelessWidget {
                       PBadge(
                         text: item.remarks,
                         top: 6,
+                        left: 6,
                         right: 6,
-                        bottom: null,
-                        left: null,
+                        alignment: .right,
                       ),
                     ],
                   );

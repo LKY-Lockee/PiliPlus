@@ -48,9 +48,9 @@ class PgcCardV extends StatelessWidget {
                       PBadge(
                         text: item.badge,
                         top: 6,
+                        left: 6,
                         right: 6,
-                        bottom: null,
-                        left: null,
+                        alignment: .right,
                       ),
                       if (item.isFinish == 0 &&
                           item.renewalTime?.isNotEmpty == true)
@@ -58,6 +58,8 @@ class PgcCardV extends StatelessWidget {
                           text: item.renewalTime,
                           bottom: 6,
                           left: 6,
+                          right: 6,
+                          alignment: .left,
                           type: PBadgeType.gray,
                         ),
                     ],
