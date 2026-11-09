@@ -1,0 +1,84 @@
+import 'package:PiliPlus/common/widgets/flutter/refresh_indicator.dart';
+import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
+import 'package:PiliPlus/http/loading_state.dart';
+import 'package:PiliPlus/models_new/history/history_ugreen/list.dart';
+import 'package:PiliPlus/pages/history/ugreen/controller.dart';
+import 'package:PiliPlus/pages/history/ugreen/widgets/item.dart';
+import 'package:PiliPlus/utils/extension/string_ext.dart';
+import 'package:PiliPlus/utils/grid.dart';
+import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart';
+
+class HistoryUgreenPage extends StatefulWidget {
+  const HistoryUgreenPage({super.key});
+
+  @override
+  State<HistoryUgreenPage> createState() => _HistoryUgreenPageState();
+}
+
+class _HistoryUgreenPageState extends State<HistoryUgreenPage>
+    with AutomaticKeepAliveClientMixin, GridMixin {
+  late final HistoryUgreenController _historyController =
+      Get.find<HistoryUgreenController>();
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final padding = MediaQuery.viewPaddingOf(context);
+    return refreshIndicator(
+      onRefresh: _historyController.onRefresh,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: _historyController.scrollController,
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.only(
+              top: 7,
+              bottom: padding.bottom + 100,
+            ),
+            sliver: Obx(
+              () => _buildBody(_historyController.loadingState.value),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody(LoadingState<List<HistoryUgreenItemModel>?> loadingState) {
+    return switch (loadingState) {
+      Loading() => gridSkeleton,
+      Success(:final response) =>
+        response != null && response.isNotEmpty
+            ? SliverGrid.builder(
+                gridDelegate: gridDelegate,
+                itemBuilder: (context, index) {
+                  if (index == response.length - 1) {
+                    _historyController.onLoadMore();
+                  }
+                  final item = response[index];
+                  return HistoryUgreenItem(
+                    item: item,
+                    cover: item.playStatus.coverPath.isNullOrEmpty
+                        ? _historyController.coverUrl(
+                            categoryId: item.videoInfo.categoryId,
+                            posterPath: item.videoInfo.posterPath,
+                          )
+                        : item.playStatus.coverPath,
+                    ctr: _historyController,
+                    onDelete: () => _historyController.deleteItem(item),
+                  );
+                },
+                itemCount: response.length,
+              )
+            : HttpError(onReload: _historyController.onReload),
+      Error(:final errMsg) => HttpError(
+        errMsg: errMsg,
+        onReload: _historyController.onReload,
+      ),
+    };
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}

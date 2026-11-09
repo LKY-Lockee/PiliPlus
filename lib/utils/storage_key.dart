@@ -232,6 +232,8 @@ abstract final class SettingBoxKey {
       vodDohList = 'vodDohList',
       vodDohUrl = 'vodDohUrl';
 
+  static const String ugreenAddress = 'ugreenAddress';
+
   static const String themeMode = 'themeMode',
       defaultTextScale = 'textScale',
       appFontWeightV2 = 'appFontWeightV2',

@@ -16,6 +16,7 @@ List<SettingsModel> get vodSettings => [
     leading: const Icon(Icons.dns_outlined),
     onTap: (context, setState) => Get.toNamed('/vodSourceManage'),
   ),
+  const SettingsDivider(),
   const SwitchModel(
     title: '视频广告过滤',
     subtitle: '播放点播视频时过滤 m3u8 广告切片',
@@ -36,6 +37,7 @@ List<SettingsModel> get vodSettings => [
     defaultVal: true,
     leading: Icon(Icons.notifications_active_outlined),
   ),
+  const SettingsDivider(),
   const SwitchModel(
     title: '自动换源',
     subtitle: '当前源所有线路不可用时自动切换到其它同名源',
@@ -62,6 +64,7 @@ List<SettingsModel> get vodSettings => [
     leading: Icon(Icons.loop_outlined),
     onTap: _showAutoSwitchRetryDialog,
   ),
+  const SettingsDivider(),
   NormalModel(
     title: '安全DNS',
     getSubtitle: () {

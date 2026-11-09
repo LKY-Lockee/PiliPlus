@@ -1,3 +1,5 @@
+import 'package:PiliPlus/models/common/setting_type.dart';
+import 'package:PiliPlus/pages/setting/common_setting.dart';
 import 'package:PiliPlus/pages/setting/models/model.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -8,6 +10,12 @@ List<SettingsModel> get thirdPartySettings => [
     title: '点播设置',
     subtitle: '源设置、去广告、自动换源/换线、DNS',
     leading: const Icon(MdiIcons.movieOpenOutline),
-    onTap: (context, setState) => Get.toNamed('/vodSettings'),
+    onTap: (context, setState) =>
+        Get.to(const CommonSetting(settingType: SettingType.vodSetting)),
+  ),
+  NormalModel(
+    title: '绿联云',
+    leading: const Icon(Icons.cloud_outlined),
+    onTap: (context, setState) => Get.toNamed('/ugreenSettings'),
   ),
 ];

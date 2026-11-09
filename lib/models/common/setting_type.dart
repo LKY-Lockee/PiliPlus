@@ -6,6 +6,7 @@ import 'package:PiliPlus/pages/setting/models/recommend_settings.dart';
 import 'package:PiliPlus/pages/setting/models/style_settings.dart';
 import 'package:PiliPlus/pages/setting/models/third_party_settings.dart';
 import 'package:PiliPlus/pages/setting/models/video_settings.dart';
+import 'package:PiliPlus/pages/setting/models/vod_settings.dart';
 
 enum SettingType {
   privacySetting('隐私设置'),
@@ -14,6 +15,7 @@ enum SettingType {
   playSetting('播放器设置'),
   styleSetting('外观设置'),
   thirdPartySetting('第三方平台设置'),
+  vodSetting('点播设置'),
   extraSetting('其它设置'),
   webdavSetting('WebDAV 设置'),
   about('关于'),
@@ -29,6 +31,7 @@ enum SettingType {
     .playSetting => playSettings,
     .styleSetting => styleSettings,
     .thirdPartySetting => thirdPartySettings,
+    .vodSetting => vodSettings,
     .extraSetting => extraSettings,
     _ => throw UnimplementedError(),
   };

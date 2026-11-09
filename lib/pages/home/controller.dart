@@ -36,7 +36,7 @@ class HomeController extends GetxController
       HomeTabType.cinema => SearchType.media_ft,
       HomeTabType.live => SearchType.live_room,
       HomeTabType.vod => SearchType.vod,
-      HomeTabType.rcmd || HomeTabType.hot || HomeTabType.rank => SearchType.all,
+      _ => SearchType.all,
     };
     return SearchType.actives.indexOf(searchType);
   }

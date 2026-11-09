@@ -393,6 +393,15 @@ abstract final class Pref {
   static Future<void> clearVodDisabledSites() =>
       _setting.delete(SettingBoxKey.vodDisabledSites);
 
+  static String get ugreenAddress =>
+      _setting.get(SettingBoxKey.ugreenAddress, defaultValue: '');
+
+  static set setUgreenAddress(String value) =>
+      _setting.put(SettingBoxKey.ugreenAddress, value);
+
+  static Future<void> clearUgreenAddress() =>
+      _setting.delete(SettingBoxKey.ugreenAddress);
+
   static DynamicsTabType get defaultDynamicType =>
       DynamicsTabType.values[defaultDynamicTypeIndex];
 

@@ -372,6 +372,10 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    TextStyle titleStyle = theme.textTheme.titleMedium!;
+    TextStyle subTitleStyle = theme.textTheme.labelMedium!.copyWith(
+      color: theme.colorScheme.outline,
+    );
     return SimpleScaffold(
       appBar: AppBar(title: const Text('源设置')),
       body: ListView(
@@ -379,41 +383,42 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
         children: [
           ListTile(
             leading: const Icon(Icons.rss_feed),
-            title: const Text('订阅地址'),
+            title: Text('订阅地址', style: titleStyle),
             subtitle: Text(
               Pref.vodConfigUrl.isEmpty ? '点击配置' : Pref.vodConfigUrl,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              style: subTitleStyle,
             ),
             onTap: () => _showConfigUrlDialog(initialValue: Pref.vodConfigUrl),
           ),
           ListTile(
             leading: const Icon(Icons.collections_bookmark_outlined),
-            title: const Text('已存订阅'),
-            subtitle: Text('共 ${configUrls.length} 个订阅'),
+            title: Text('已存订阅', style: titleStyle),
+            subtitle: Text('共 ${configUrls.length} 个订阅', style: subTitleStyle),
             onTap: _showConfigUrlsPicker,
           ),
           ListTile(
             leading: const Icon(Icons.auto_fix_high_outlined),
-            title: const Text('默认解析'),
+            title: Text('默认解析', style: titleStyle),
             subtitle: Text(
               Pref.vodDefaultParse.isEmpty ? '自动选择' : Pref.vodDefaultParse,
+              style: subTitleStyle,
             ),
             onTap: _showParsePicker,
           ),
           ListTile(
             leading: const Icon(Icons.phone_android_outlined),
-            title: const Text('请求 UA'),
-            subtitle: Text(Pref.vodUA, maxLines: 1),
+            title: Text('请求 UA', style: titleStyle),
+            subtitle: Text(Pref.vodUA, style: subTitleStyle),
             onTap: _showUaDialog,
           ),
           ListTile(
             leading: const Icon(Icons.recommend_outlined),
-            title: const Text('首页推荐'),
+            title: Text('首页推荐', style: titleStyle),
             subtitle: Text(
               TVBoxService.to.homeRec.value == TVBoxService.homeRecDouban
                   ? '豆瓣热播'
                   : '站点推荐',
+              style: subTitleStyle,
             ),
             onTap: _showHomeRecPicker,
           ),
@@ -421,18 +426,14 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
               TVBoxService.to.homeRec.value == TVBoxService.homeRecSite)
             ListTile(
               leading: const Icon(Icons.home_outlined),
-              title: const Text('首页站源'),
-              subtitle: Text(
-                _homeSourceName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              title: Text('首页站源', style: titleStyle),
+              subtitle: Text(_homeSourceName, style: subTitleStyle),
               onTap: _showHomeSourcePicker,
             ),
           ListTile(
             leading: const Icon(Icons.refresh),
-            title: const Text('刷新配置'),
-            subtitle: const Text('忽略缓存重新拉取'),
+            title: Text('刷新配置', style: titleStyle),
+            subtitle: Text('忽略缓存重新拉取', style: subTitleStyle),
             onTap: _reload,
           ),
           const Divider(height: 1),
