@@ -4,6 +4,7 @@ import 'package:PiliPlus/common/widgets/image/image_save.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/models_new/vod/video_data.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox_service.dart';
+import 'package:PiliPlus/utils/extension/string_ext.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:material_ui/material_ui.dart';
@@ -57,14 +58,13 @@ class SearchVodItem extends StatelessWidget {
                     height: 148,
                     src: item.cover,
                   ),
-                  if (sourceName != null)
-                    PBadge(
-                      text: sourceName,
-                      top: 6.0,
-                      right: 4.0,
-                      bottom: null,
-                      left: null,
-                    ),
+                  PBadge(
+                    text: sourceName,
+                    top: 6.0,
+                    right: 6.0,
+                    bottom: null,
+                    left: null,
+                  ),
                 ],
               ),
               const SizedBox(width: 10),
@@ -72,14 +72,13 @@ class SearchVodItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 4),
                     Text(
                       item.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 12),
-                    if (item.score != null && item.score!.isNotEmpty)
+                    if (!item.score.isNullOrEmpty)
                       Text('评分:${item.score}', style: style),
                     if (meta1.isNotEmpty) Text(meta1, style: style),
                     if (meta2.isNotEmpty) Text(meta2, style: style),

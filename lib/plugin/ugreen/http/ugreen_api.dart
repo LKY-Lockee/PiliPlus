@@ -14,6 +14,7 @@ abstract final class UgreenApi {
   static const String folderList = 'v1/video/poster_wall/media_lib/get_folder';
   static const String mediaList = 'v1/video/homepage/media_list';
   static const String videoAll = 'v1/video/all';
+  static const String videoSearch = 'v2/video/search';
   static const String recentlyPlayedGet = 'v1/video/recently_played/get';
   static const String recentlyPlayedDelete = 'v1/video/recently_played/delete';
   static const String collectGet = 'v1/video/collect/get';
