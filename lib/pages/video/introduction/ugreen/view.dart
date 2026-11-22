@@ -15,12 +15,12 @@ import 'package:material_ui/material_ui.dart';
 
 class UgreenIntroPage extends StatefulWidget {
   final String heroTag;
-  final bool isLandscape;
+  final bool isPortrait;
 
   const UgreenIntroPage({
     super.key,
     required this.heroTag,
-    required this.isLandscape,
+    required this.isPortrait,
   });
 
   @override
@@ -29,6 +29,7 @@ class UgreenIntroPage extends StatefulWidget {
 
 class _UgreenIntroPageState extends State<UgreenIntroPage> {
   late final UgreenIntroController introController;
+  late ColorScheme colorScheme;
 
   @override
   void initState() {
@@ -40,10 +41,15 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    colorScheme = ColorScheme.of(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.of(context);
-    final isLandscape = widget.isLandscape;
-    final sliver = SliverToBoxAdapter(
+    final isPortrait = widget.isPortrait;
+    Widget sliver = SliverToBoxAdapter(
       child: Obx(
         () {
           final item = introController.video.value;
@@ -64,22 +70,22 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
                 spacing: 10,
                 children: [
                   _buildCover(item),
-                  Expanded(
-                    child: _buildInfoPanel(
-                      isLandscape,
-                      colorScheme,
-                      item,
-                    ),
-                  ),
+                  Expanded(child: _buildInfoPanel(isPortrait, item)),
                 ],
               ),
               const SizedBox(height: 6),
-              if (introController.seasons.length > 1) ...[
-                const SizedBox(height: 5),
-                UgreenSeasonPanel(ugreenController: introController),
-              ],
-              if (introController.episodes.isNotEmpty)
-                UgreenPanel(introController: introController),
+              // seasons
+              if (introController.hasSeasons)
+                Padding(
+                  padding: const .only(top: 5),
+                  child: SeasonPanel(
+                    ugreenController: introController,
+                  ),
+                ),
+              if (introController.hasEpisodes)
+                UgreenPanel(
+                  introController: introController,
+                ),
             ],
           );
         },
@@ -96,7 +102,7 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
     );
   }
 
-  Widget _buildCover(UgreenVideoSummary video) {
+  Widget _buildCover(UgreenVideoSummary item) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -118,9 +124,9 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
             ),
           ),
         ),
-        if (video.score > 0)
+        if (item.score > 0)
           PBadge(
-            text: '评分 ${video.score.toStringAsFixed(1)}',
+            text: '评分 ${item.score.toStringAsFixed(1)}',
             top: null,
             right: 6,
             bottom: 6,
@@ -130,11 +136,28 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
     );
   }
 
-  Widget _buildInfoPanel(
-    bool isLandscape,
-    ColorScheme colorScheme,
-    UgreenVideoSummary item,
-  ) {
+  Widget _buildInfoPanel(bool isPortrait, UgreenVideoSummary item) {
+    Widget subBtn() => Obx(
+      () {
+        final isFav = introController.isFavorite.value;
+        return FilledButton.tonal(
+          style: FilledButton.styleFrom(
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 10,
+            ),
+            visualDensity: VisualDensity.compact,
+            foregroundColor: isFav ? colorScheme.outline : null,
+            backgroundColor: isFav ? colorScheme.onInverseSurface : null,
+          ),
+          onPressed: introController.toggleFavorite,
+          child: Text(
+            isFav ? '已收藏' : '收藏',
+          ),
+        );
+      },
+    );
     Widget title() => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
@@ -147,6 +170,7 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        subBtn(),
       ],
     );
     List<Widget> desc() => [
@@ -160,7 +184,7 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
       spacing: 6,
       runSpacing: 2,
       children: [
-        if (isLandscape) ...desc(),
+        if (!isPortrait) ...desc(),
       ],
     );
     return GestureDetector(
@@ -174,7 +198,7 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
             title(),
             stat(),
             const SizedBox(height: 5),
-            if (!isLandscape) ...desc(),
+            if (isPortrait) ...desc(),
             const SizedBox(height: 5),
             Expanded(
               child: Text(

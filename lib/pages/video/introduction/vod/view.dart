@@ -20,12 +20,12 @@ import 'package:material_ui/material_ui.dart';
 
 class VodIntroPage extends StatefulWidget {
   final String heroTag;
-  final bool isLandscape;
+  final bool isPortrait;
 
   const VodIntroPage({
     super.key,
     required this.heroTag,
-    required this.isLandscape,
+    required this.isPortrait,
   });
 
   @override
@@ -34,6 +34,7 @@ class VodIntroPage extends StatefulWidget {
 
 class _VodIntroPageState extends State<VodIntroPage> {
   late final VodIntroController introController;
+  late ColorScheme colorScheme;
 
   @override
   void initState() {
@@ -45,9 +46,14 @@ class _VodIntroPageState extends State<VodIntroPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    colorScheme = ColorScheme.of(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.of(context);
-    final isLandscape = widget.isLandscape;
+    final isPortrait = widget.isPortrait;
     Widget sliver = SliverToBoxAdapter(
       child: Obx(
         () {
@@ -69,19 +75,15 @@ class _VodIntroPageState extends State<VodIntroPage> {
                 spacing: 10,
                 children: [
                   _buildCover(item),
-                  Expanded(
-                    child: _buildInfoPanel(
-                      isLandscape,
-                      colorScheme,
-                      item.video,
-                    ),
-                  ),
+                  Expanded(child: _buildInfoPanel(isPortrait, item.video)),
                 ],
               ),
               const SizedBox(height: 6),
               actionGrid(item),
               if (item.playFlags.isNotEmpty)
-                VodPanel(introController: introController),
+                VodPanel(
+                  introController: introController,
+                ),
             ],
           );
         },
@@ -131,11 +133,7 @@ class _VodIntroPageState extends State<VodIntroPage> {
     );
   }
 
-  Widget _buildInfoPanel(
-    bool isLandscape,
-    ColorScheme colorScheme,
-    VodVideo item,
-  ) {
+  Widget _buildInfoPanel(bool isPortrait, VodVideo item) {
     Widget title() => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
@@ -168,7 +166,7 @@ class _VodIntroPageState extends State<VodIntroPage> {
       spacing: 6,
       runSpacing: 2,
       children: [
-        if (isLandscape) ...desc(),
+        if (!isPortrait) ...desc(),
       ],
     );
     return GestureDetector(
@@ -182,7 +180,7 @@ class _VodIntroPageState extends State<VodIntroPage> {
             title(),
             stat(),
             const SizedBox(height: 5),
-            if (!isLandscape) ...desc(),
+            if (isPortrait) ...desc(),
             const SizedBox(height: 5),
             Expanded(
               child: Text(

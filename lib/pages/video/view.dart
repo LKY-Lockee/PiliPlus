@@ -1680,7 +1680,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
   Widget vodIntroPanel({
     bool needCtr = true,
-    bool isLandscape = false,
+    bool isPortrait = true,
   }) {
     return CustomScrollView(
       controller: needCtr
@@ -1694,7 +1694,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           sliver: VodIntroPage(
             key: videoIntroKey,
             heroTag: heroTag,
-            isLandscape: isLandscape,
+            isPortrait: isPortrait,
           ),
         ),
       ],
@@ -1703,7 +1703,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
   Widget ugreenIntroPanel({
     bool needCtr = true,
-    bool isLandscape = false,
+    bool isPortrait = true,
   }) {
     return CustomScrollView(
       controller: needCtr
@@ -1717,7 +1717,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           sliver: UgreenIntroPage(
             key: videoIntroKey,
             heroTag: heroTag,
-            isLandscape: isLandscape,
+            isPortrait: isPortrait,
           ),
         ),
       ],
@@ -1735,10 +1735,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       return localIntroPanel(needCtr: needCtr);
     }
     if (videoDetailController.isVod) {
-      return vodIntroPanel(needCtr: needCtr, isLandscape: !isPortrait);
+      return vodIntroPanel(needCtr: needCtr, isPortrait: isPortrait);
     }
     if (videoDetailController.isUgreen) {
-      return ugreenIntroPanel(needCtr: needCtr, isLandscape: !isPortrait);
+      return ugreenIntroPanel(needCtr: needCtr, isPortrait: isPortrait);
     }
 
     Widget child = CustomScrollView(

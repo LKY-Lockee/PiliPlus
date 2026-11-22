@@ -11,6 +11,7 @@ import 'package:PiliPlus/pages/episode_panel/ugreen/view.dart';
 import 'package:PiliPlus/pages/video/introduction/ugreen/widgets/intro_detail.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/ugreen/http/ugreen_endpoint.dart';
+import 'package:PiliPlus/plugin/ugreen/http/ugreen_fav.dart';
 import 'package:PiliPlus/plugin/ugreen/http/ugreen_media.dart';
 import 'package:PiliPlus/plugin/ugreen/http/ugreen_video.dart';
 import 'package:PiliPlus/plugin/ugreen/ugreen_play_proxy.dart';
@@ -35,6 +36,7 @@ class UgreenIntroController extends CommonIntroController {
   final RxInt audioIndex = (-1).obs;
   final RxBool isDetailLoading = false.obs;
   final RxnString detailError = RxnString();
+  final RxBool isFavorite = false.obs;
 
   late int _ugVideoInfoId;
   late final int _mediaLibSetId;
@@ -50,6 +52,7 @@ class UgreenIntroController extends CommonIntroController {
   int _runId = 0;
   bool _isLoadingShown = false;
   bool _changingSeason = false;
+  bool _favoriteProcessing = false;
   ScrollController? _seasonController;
 
   String _taskId = '';
@@ -60,7 +63,7 @@ class UgreenIntroController extends CommonIntroController {
 
   bool get isTv => (video.value?.type ?? _ugType) == 2;
 
-  bool get hasSelectableMedia => episodes.length > 1;
+  bool get hasEpisodes => episodes.length > 1;
 
   bool get hasSeasons => seasons.length > 1;
 
@@ -243,6 +246,7 @@ class UgreenIntroController extends CommonIntroController {
 
   void _applyMovie(UgreenMovieDetail detail) {
     seasons.clear();
+    isFavorite.value = detail.isFavorite;
     video.value = detail.videoInfo;
     final episode = UgreenPlayEpisode.fromMovie(detail, 0);
     if (episode.files.isEmpty) {
@@ -261,6 +265,7 @@ class UgreenIntroController extends CommonIntroController {
       [...detail.seasonInfo]
         ..sort((a, b) => a.seasonNum.compareTo(b.seasonNum)),
     );
+    isFavorite.value = detail.isFavorite;
     video.value = detail.videoInfo;
     episodes.assignAll([
       for (var i = 0; i < detail.tvInfo.length; i++)
@@ -417,6 +422,50 @@ class UgreenIntroController extends CommonIntroController {
     } finally {
       _dismissLoading();
       _changingSeason = false;
+    }
+  }
+
+  Future<void> toggleFavorite() async {
+    if (_favoriteProcessing || isClosed) {
+      return;
+    }
+    final current = service.session.value;
+    final data = video.value;
+    if (current == null) {
+      _toast('请先登录绿联云');
+      return;
+    }
+    if (data == null) {
+      return;
+    }
+    _favoriteProcessing = true;
+    final target = !isFavorite.value;
+    try {
+      final res = target
+          ? await UgreenFavHttp.addFavorite(
+              current,
+              categoryId: data.categoryId,
+              ugVideoInfoId: data.ugVideoInfoId,
+              type: data.type,
+              mediaLibSetId: data.mediaLibSetId,
+            )
+          : await UgreenFavHttp.deleteFavorite(
+              current,
+              categoryId: data.categoryId,
+              mediaLibSetId: data.mediaLibSetId,
+              type: data.type,
+            );
+      if (isClosed) {
+        return;
+      }
+      if (res is Success) {
+        isFavorite.value = target;
+        _toast(target ? '收藏成功' : '取消收藏成功');
+      } else if (res is Error) {
+        _handleError(res);
+      }
+    } finally {
+      _favoriteProcessing = false;
     }
   }
 
@@ -920,7 +969,7 @@ class UgreenIntroController extends CommonIntroController {
   }
 
   void showEpisodePanel() {
-    if (!hasSelectableMedia) {
+    if (!hasEpisodes) {
       return;
     }
     final context = Get.context;

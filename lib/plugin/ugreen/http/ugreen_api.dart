@@ -21,6 +21,7 @@ abstract final class UgreenApi {
   static const String recentlyPlayedCreate = 'v1/video/recently_played/create';
   static const String recentlyPlayedDelete = 'v1/video/recently_played/delete';
   static const String collectGet = 'v1/video/collect/get';
+  static const String collectCreate = 'v1/video/collect/create';
   static const String collectDelete = 'v1/video/collect/delete';
   static const String imageStream = 'v2/video/getImaStream';
   static const String transcodeInfo = 'v2/stream/transcode/web/info';

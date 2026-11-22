@@ -39,6 +39,35 @@ abstract final class UgreenFavHttp {
     }
   }
 
+  static Future<LoadingState<void>> addFavorite(
+    UgreenSession session, {
+    required String categoryId,
+    required int ugVideoInfoId,
+    required int type,
+    int? mediaLibSetId,
+  }) async {
+    final res = await UgreenEndpoint.request(
+      session,
+      UgreenApi.collectCreate,
+      method: 'POST',
+      data: {
+        'ids': [
+          {
+            'category_id': categoryId,
+            'ug_video_info_id': ugVideoInfoId,
+            'type': type,
+          },
+        ],
+        if (mediaLibSetId != null && mediaLibSetId > 0)
+          'media_lib_set_id': mediaLibSetId,
+      },
+    );
+    if (res is Error) {
+      return res;
+    }
+    return const Success(null);
+  }
+
   static Future<LoadingState<void>> deleteFavorite(
     UgreenSession session, {
     required String categoryId,

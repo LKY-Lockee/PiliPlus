@@ -4,8 +4,8 @@ import 'package:PiliPlus/common/widgets/marquee.dart';
 import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
 import 'package:material_ui/material_ui.dart';
 
-class UgreenSeasonPanel extends StatelessWidget {
-  const UgreenSeasonPanel({
+class SeasonPanel extends StatelessWidget {
+  const SeasonPanel({
     super.key,
     required this.ugreenController,
   });
@@ -26,7 +26,7 @@ class UgreenSeasonPanel extends StatelessWidget {
         controller: controller,
         itemCount: seasons.length,
         scrollDirection: .horizontal,
-        key: const PageStorageKey(UgreenSeasonPanel),
+        key: const PageStorageKey(SeasonPanel),
         physics: const AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final item = seasons[index];
