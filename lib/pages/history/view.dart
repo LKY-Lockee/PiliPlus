@@ -10,12 +10,26 @@ import 'package:PiliPlus/pages/common/multi_select/multi_select_controller.dart'
 import 'package:PiliPlus/pages/history/base_controller.dart';
 import 'package:PiliPlus/pages/history/bili/controller.dart';
 import 'package:PiliPlus/pages/history/bili/view.dart';
+import 'package:PiliPlus/pages/history/ugreen/controller.dart';
+import 'package:PiliPlus/pages/history/ugreen/view.dart';
 import 'package:PiliPlus/pages/history/vod/controller.dart';
 import 'package:PiliPlus/pages/history/vod/view.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/cache/cache_manager.dart';
 import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
+
+class _HistoryTabItem {
+  const _HistoryTabItem({
+    required this.title,
+    required this.page,
+    required this.controller,
+  });
+
+  final String? title;
+  final Widget page;
+  final MultiSelectController Function() controller;
+}
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -31,40 +45,84 @@ class _HistoryPageState extends State<HistoryPage>
   );
   HistoryBiliController? _biliController;
   final HistoryVodController _vodController = Get.put(HistoryVodController());
+  final HistoryUgreenController _ugreenController = Get.put(
+    HistoryUgreenController(),
+  );
 
   Worker? _tabsWorker;
   late TabController _tabController;
+  late final Type? _initialPage;
 
   bool get _isLogin => _baseController.account.isLogin;
+
+  List<_HistoryTabItem> get _tabItems => [
+    if (_isLogin) ...[
+      _HistoryTabItem(
+        title: '全部',
+        page: const HistoryBiliPage(),
+        controller: () => _biliController!,
+      ),
+      for (final item in _biliController!.tabs)
+        _HistoryTabItem(
+          title: item.name,
+          page: HistoryBiliPage(type: item.type),
+          controller: () => Get.find<HistoryBiliController>(tag: item.type),
+        ),
+    ],
+    _HistoryTabItem(
+      title: '点播',
+      page: const HistoryVodPage(),
+      controller: () => _vodController,
+    ),
+    _HistoryTabItem(
+      title: '绿联云',
+      page: const HistoryUgreenPage(),
+      controller: () => _ugreenController,
+    ),
+  ];
+
+  int _indexOfInitialPage(List<_HistoryTabItem> items) {
+    final page = _initialPage;
+    if (page == null) {
+      return 0;
+    }
+    final index = items.indexWhere((item) => item.page.runtimeType == page);
+    return index == -1 ? 0 : index;
+  }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _isLogin ? 2 : 1, vsync: this);
+    _initialPage = Get.arguments is Type ? Get.arguments as Type : null;
     if (_isLogin) {
       _biliController = Get.put(HistoryBiliController(null), tag: 'all');
+    }
+    final items = _tabItems;
+    _tabController = TabController(
+      length: items.length,
+      initialIndex: _indexOfInitialPage(items),
+      vsync: this,
+    );
+    if (_isLogin) {
       _tabsWorker = ever(
         _biliController!.tabs,
-        (tabs) => () {
+        (_) {
+          final items = _tabItems;
+          final index = _indexOfInitialPage(items);
           _tabController.dispose();
-          _tabController = TabController(length: tabs.length + 2, vsync: this);
-        }(),
+          _tabController = TabController(
+            length: items.length,
+            initialIndex: index,
+            vsync: this,
+          );
+        },
       );
       _baseController.historyStatus();
     }
   }
 
   MultiSelectController currCtr([int? index]) {
-    index ??= _tabController.index;
-    if (!_isLogin || index == _biliController!.tabs.length + 1) {
-      return _vodController;
-    }
-    if (index == 0) {
-      return _biliController!;
-    }
-    return Get.find<HistoryBiliController>(
-      tag: _biliController!.tabs[index - 1].type,
-    );
+    return _tabItems[index ?? _tabController.index].controller();
   }
 
   @override
@@ -80,6 +138,7 @@ class _HistoryPageState extends State<HistoryPage>
     final padding = MediaQuery.viewPaddingOf(context);
     return Obx(() {
       final enableMultiSelect = _baseController.enableMultiSelect.value;
+      final tabs = _tabItems;
       return popScope(
         canPop: !enableMultiSelect,
         onPopInvokedWithResult: (didPop, result) {
@@ -108,19 +167,15 @@ class _HistoryPageState extends State<HistoryPage>
                           ctr.scrollController.animToTop();
                         case HistoryVodController ctr:
                           ctr.scrollController.animToTop();
+                        case HistoryUgreenController ctr:
+                          ctr.scrollController.animToTop();
                       }
                     } else if (enableMultiSelect) {
                       currCtr(_tabController.previousIndex).handleSelect();
                     }
                   },
                   tabs: [
-                    if (_isLogin) ...[
-                      const Tab(text: '全部'),
-                      ..._biliController!.tabs.map(
-                        (item) => Tab(text: item.name),
-                      ),
-                    ],
-                    const Tab(text: '点播'),
+                    for (final item in tabs) Tab(text: item.title),
                   ],
                 ),
                 Expanded(
@@ -132,13 +187,7 @@ class _HistoryPageState extends State<HistoryPage>
                     horizontalDragGestureRecognizer:
                         CustomHorizontalDragGestureRecognizer.new,
                     children: [
-                      if (_isLogin) ...[
-                        const HistoryBiliPage(),
-                        ..._biliController!.tabs.map(
-                          (item) => HistoryBiliPage(type: item.type),
-                        ),
-                      ],
-                      const HistoryVodPage(),
+                      for (final item in tabs) item.page,
                     ],
                   ),
                 ),
@@ -175,6 +224,7 @@ class _HistoryPageState extends State<HistoryPage>
                     account: account,
                   ),
                   HistoryVodController() => CacheManager.clearHistory(),
+                  HistoryUgreenController ctr => ctr.clearHistory(),
                   _ => throw UnimplementedError(),
                 },
                 () {
@@ -196,6 +246,9 @@ class _HistoryPageState extends State<HistoryPage>
                     case HistoryVodController ctr:
                       ctr.loadingState.value = const Success(null);
                       break;
+                    case HistoryUgreenController ctr:
+                      ctr.loadingState.value = const Success(null);
+                      break;
                     default:
                       throw UnimplementedError();
                   }
@@ -208,6 +261,7 @@ class _HistoryPageState extends State<HistoryPage>
             onTap: () => switch (currCtr()) {
               HistoryBiliController ctr => ctr.onDelViewedHistory(),
               HistoryVodController ctr => ctr.onDelViewedHistory(),
+              HistoryUgreenController ctr => ctr.onDelViewedHistory(),
               _ => throw UnimplementedError(),
             },
             child: const Text('删除已看记录'),

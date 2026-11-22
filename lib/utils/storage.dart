@@ -25,6 +25,7 @@ abstract final class GStorage {
   static late final Box<dynamic> vodHistory;
   static late final Box<int> vodProgress;
   static late final Box<dynamic> vodFav;
+  static late final Box<dynamic> ugreen;
   static late final Box<Uint8List>? reply;
 
   static Future<void> init() async {
@@ -61,7 +62,7 @@ abstract final class GStorage {
       Hive.openBox<int>(
         'watchProgress',
         keyComparator: _intStrDescKeyComparator,
-        compactionStrategy: (entries, deletedEntries) {
+        compactionStrategy: (int entries, int deletedEntries) {
           return deletedEntries > 4;
         },
       ).then((res) => watchProgress = res),
@@ -74,7 +75,7 @@ abstract final class GStorage {
       ).then((res) => vodHistory = res),
       Hive.openBox<int>(
         'vodProgress',
-        compactionStrategy: (entries, deletedEntries) {
+        compactionStrategy: (int entries, int deletedEntries) {
           return deletedEntries > 4;
         },
       ).then((res) => vodProgress = res),
@@ -84,6 +85,12 @@ abstract final class GStorage {
           return deletedEntries > 4;
         },
       ).then((res) => vodFav = res),
+      Hive.openBox(
+        'ugreen',
+        compactionStrategy: (int entries, int deletedEntries) {
+          return deletedEntries > 4;
+        },
+      ).then((res) => ugreen = res),
     ]);
 
     if (Pref.saveReply) {
@@ -142,6 +149,7 @@ abstract final class GStorage {
       vodHistory.compact(),
       vodProgress.compact(),
       vodFav.compact(),
+      ugreen.compact(),
       ?reply?.compact(),
     ]);
   }
@@ -158,6 +166,7 @@ abstract final class GStorage {
       vodHistory.close(),
       vodProgress.close(),
       vodFav.close(),
+      ugreen.close(),
       ?reply?.close(),
     ]);
   }
@@ -174,6 +183,7 @@ abstract final class GStorage {
       vodHistory.clear(),
       vodProgress.clear(),
       vodFav.clear(),
+      ugreen.clear(),
       ?reply?.clear(),
     ]);
   }

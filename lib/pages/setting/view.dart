@@ -125,6 +125,7 @@ class _SettingPageState extends State<SettingPage> {
                       .playSetting ||
                       .styleSetting ||
                       .thirdPartySetting ||
+                      .vodSetting ||
                       .extraSetting => CommonSetting(
                         settingType: _type,
                         showAppBar: false,
@@ -157,6 +158,7 @@ class _SettingPageState extends State<SettingPage> {
           .playSetting ||
           .styleSetting ||
           .thirdPartySetting ||
+          .vodSetting ||
           .extraSetting => CommonSetting(settingType: type),
           .webdavSetting => const WebDavSettingPage(),
           .about => const AboutPage(),

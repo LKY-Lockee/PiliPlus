@@ -3,6 +3,7 @@ import 'package:PiliPlus/pages/fav/cheese/view.dart';
 import 'package:PiliPlus/pages/fav/note/view.dart';
 import 'package:PiliPlus/pages/fav/pgc/view.dart';
 import 'package:PiliPlus/pages/fav/topic/view.dart';
+import 'package:PiliPlus/pages/fav/ugreen/view.dart';
 import 'package:PiliPlus/pages/fav/video/view.dart';
 import 'package:PiliPlus/pages/fav/vod/view.dart';
 import 'package:material_ui/material_ui.dart';
@@ -16,6 +17,7 @@ enum FavTabType {
   topic('话题', FavTopicPage()),
   cheese('课堂', FavCheesePage()),
   vod('点播', FavVodPage()),
+  ugreen('绿联云', FavUgreenPage()),
   ;
 
   final String title;

@@ -318,7 +318,7 @@ class _EpisodeVodPanelState extends State<EpisodeVodPanel>
             final currentTabIndex = _currentTabIndex.value;
             if (currentTabIndex != widget.initialTabIndex) {
               _tabController.animateTo(widget.initialTabIndex);
-              await Future.delayed(const Duration(milliseconds: 225));
+              await Future.pause(const Duration(milliseconds: 225));
             }
             _itemScrollController[widget.initialTabIndex].animTo(
               _calcItemOffset(

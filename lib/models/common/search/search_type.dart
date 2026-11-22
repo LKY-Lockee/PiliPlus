@@ -22,6 +22,8 @@ enum SearchType implements EnumWithLabel {
   article('专栏'),
   // 点播：tvbox
   vod('点播'),
+  // 绿联云
+  ugreen('绿联云'),
   // 视频：video
   video('视频'),
   ;
@@ -42,5 +44,6 @@ enum SearchType implements EnumWithLabel {
     .bili_user,
     .article,
     .vod,
+    .ugreen,
   ];
 }

@@ -579,6 +579,36 @@ abstract final class PageUtils {
     off: off,
   );
 
+  static Future<void>? toUgreenPage({
+    required int ugVideoInfoId,
+    required int mediaLibSetId,
+    required int type,
+    String? initialFilePath,
+    int? initialEpisodeId,
+    int? initialEpisode,
+    bool off = false,
+  }) {
+    final key = '${type}_$ugVideoInfoId';
+    return toDupNamed(
+      '/videoV',
+      arguments: {
+        'aid': 0,
+        'bvid': 'ugreen_$key',
+        'cid': 0,
+        'videoType': VideoType.ugc,
+        'sourceType': SourceType.ugreen,
+        'ugVideoInfoId': ugVideoInfoId,
+        'mediaLibSetId': mediaLibSetId,
+        'ugType': type,
+        'initialFilePath': ?initialFilePath,
+        'initialEpisodeId': ?initialEpisodeId,
+        'initialEpisode': ?initialEpisode,
+        'heroTag': Utils.makeHeroTag('ugreen_$key'),
+      },
+      off: off,
+    );
+  }
+
   static final _pgcRegex = RegExp(r'(ep|ss)(\d+)');
   static bool viewPgcFromUri(
     String uri, {

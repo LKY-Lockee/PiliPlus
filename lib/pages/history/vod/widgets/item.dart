@@ -82,22 +82,28 @@ class HistoryVodItem extends StatelessWidget {
                                 text: item.progress == -1
                                     ? '已看完'
                                     : '${DurationUtils.formatDuration(item.progress)}/${DurationUtils.formatDuration(item.duration)}',
-                                right: 6.0,
                                 bottom: 8.0,
+                                left: 6.0,
+                                right: 6.0,
+                                alignment: .right,
                                 type: PBadgeType.gray,
                               ),
                             if (item.isFav)
                               const PBadge(
                                 text: '已收藏',
                                 top: 6.0,
+                                left: 6.0,
                                 right: 6.0,
+                                alignment: .right,
                                 type: PBadgeType.gray,
                               )
                             else if (item.remarks?.isNotEmpty == true)
                               PBadge(
                                 text: item.remarks,
                                 top: 6.0,
+                                left: 6.0,
                                 right: 6.0,
+                                alignment: .right,
                                 type: PBadgeType.primary,
                               ),
                             if (hasDuration &&

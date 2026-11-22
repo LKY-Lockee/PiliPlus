@@ -58,8 +58,9 @@ import 'package:PiliPlus/pages/setting/pages/display_mode.dart';
 import 'package:PiliPlus/pages/setting/pages/font_setting.dart';
 import 'package:PiliPlus/pages/setting/pages/logs.dart';
 import 'package:PiliPlus/pages/setting/pages/play_speed_set.dart';
-import 'package:PiliPlus/pages/setting/pages/vod_settings.dart';
-import 'package:PiliPlus/pages/setting/pages/vod_source_manage.dart';
+import 'package:PiliPlus/pages/setting/pages/ugreen/login/view.dart';
+import 'package:PiliPlus/pages/setting/pages/ugreen/ugreen_settings.dart';
+import 'package:PiliPlus/pages/setting/pages/vod/vod_source_manage.dart';
 import 'package:PiliPlus/pages/setting/view.dart';
 import 'package:PiliPlus/pages/settings_search/view.dart';
 import 'package:PiliPlus/pages/space_setting/view.dart';
@@ -183,8 +184,11 @@ class Routes {
 
     // 点播嗅探
     GetPage(name: '/vodSniffer', page: () => const VodSnifferPage()),
-    // 点播设置
-    GetPage(name: '/vodSettings', page: () => const VodSettingsPage()),
+    // 点播源设置
     GetPage(name: '/vodSourceManage', page: () => const VodSourceManagePage()),
+
+    // 绿联云
+    GetPage(name: '/ugreenSettings', page: () => const UgreenSettingsPage()),
+    GetPage(name: '/ugreenLogin', page: () => const UgreenLoginPage()),
   ];
 }

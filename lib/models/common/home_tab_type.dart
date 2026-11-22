@@ -10,6 +10,8 @@ import 'package:PiliPlus/pages/rank/controller.dart';
 import 'package:PiliPlus/pages/rank/view.dart';
 import 'package:PiliPlus/pages/rcmd/controller.dart';
 import 'package:PiliPlus/pages/rcmd/view.dart';
+import 'package:PiliPlus/pages/ugreen/controller.dart';
+import 'package:PiliPlus/pages/ugreen/view.dart';
 import 'package:PiliPlus/pages/vod/controller.dart';
 import 'package:PiliPlus/pages/vod/view.dart';
 import 'package:get/get.dart';
@@ -23,6 +25,7 @@ enum HomeTabType implements EnumWithLabel {
   bangumi('番剧'),
   cinema('影视'),
   vod('点播'),
+  ugreen('绿联云'),
   ;
 
   @override
@@ -37,6 +40,7 @@ enum HomeTabType implements EnumWithLabel {
     HomeTabType.bangumi ||
     HomeTabType.cinema => () => Get.find<PgcController>(tag: name),
     HomeTabType.vod => () => Get.find<VodController>(),
+    HomeTabType.ugreen => () => Get.find<UgreenController>(),
   };
 
   Widget get page => switch (this) {
@@ -47,5 +51,6 @@ enum HomeTabType implements EnumWithLabel {
     HomeTabType.bangumi => const PgcPage(tabType: HomeTabType.bangumi),
     HomeTabType.cinema => const PgcPage(tabType: HomeTabType.cinema),
     HomeTabType.vod => const VodPage(),
+    HomeTabType.ugreen => const UgreenPage(),
   };
 }

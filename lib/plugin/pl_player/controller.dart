@@ -143,7 +143,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   int? _epid;
   int? _seasonId;
   int? _pgcType;
-  bool _isVod = false;
+  bool _allowSuperResolution = false;
   VideoType _videoType = VideoType.ugc;
   int _heartDuration = 0;
   int? width;
@@ -703,7 +703,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     int? epid,
     int? seasonId,
     int? pgcType,
-    bool isVod = false,
+    bool allowSuperResolution = false,
     VideoType? videoType,
     VoidCallback? onInit,
     Volume? volume,
@@ -727,7 +727,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       _epid = epid;
       _seasonId = seasonId;
       _pgcType = pgcType;
-      _isVod = isVod;
+      _allowSuperResolution = allowSuperResolution;
 
       if (showSeekPreview) {
         _clearPreview();
@@ -788,7 +788,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   }
 
   late final isAnim = _pgcType == 1 || _pgcType == 4;
-  bool get enableSuperResolution => isAnim || _isVod;
+  bool get enableSuperResolution => isAnim || _allowSuperResolution;
   late final Rx<SuperResolutionType> superResolutionType =
       (enableSuperResolution
               ? Pref.superResolutionType

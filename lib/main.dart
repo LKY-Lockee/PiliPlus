@@ -12,6 +12,7 @@ import 'package:PiliPlus/models/common/theme/theme_color_type.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox_service.dart';
+import 'package:PiliPlus/plugin/ugreen/ugreen_service.dart';
 import 'package:PiliPlus/router/app_pages.dart';
 import 'package:PiliPlus/services/account_service.dart';
 import 'package:PiliPlus/services/download/download_service.dart';
@@ -116,7 +117,9 @@ void main() async {
     ..lazyPut(DownloadService.new);
   HttpOverrides.global = _CustomHttpOverrides();
   await TVBoxHttpHelper.init();
-  Get.put(TVBoxService());
+  Get
+    ..put(TVBoxService())
+    ..put(UgreenService());
 
   if (PlatformUtils.isMobile) {
     if (Platform.isAndroid) MaxScreenSize.init();

@@ -108,6 +108,7 @@ abstract final class SearchHttp {
               .bili_user => SearchUserData.fromJson(dataData),
               .article => SearchArticleData.fromJson(dataData),
               .vod => throw UnimplementedError(),
+              .ugreen => throw UnimplementedError(),
             } as R,
           );
         } catch (e, s) {

@@ -32,6 +32,7 @@ import 'package:PiliPlus/pages/live_room/widgets/bottom_control.dart'
     as live_bottom;
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
+import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/post_panel/popup_menu_text.dart';
 import 'package:PiliPlus/pages/video/post_panel/view.dart';
@@ -403,9 +404,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     final isSeason = videoDetail.ugcSeason != null;
     final isPart = videoDetail.hasParts;
     final isPgc = !videoDetailController.isUgc;
+    final isVod = videoDetailController.isVod;
+    final isUgreen = videoDetailController.isUgreen;
     final isPlayAll = videoDetailController.isPlayAll;
-    final isNotVod = !videoDetailController.isVod;
-    final anySeason = isSeason || isPart || isPgc || isPlayAll || !isNotVod;
+    final anySeason =
+        isSeason || isPart || isPgc || isPlayAll || isVod || isUgreen;
     final isFullScreen = this.isFullScreen;
     final double widgetWidth = isLandscape && isFullScreen ? 42 : 35;
 
@@ -570,6 +573,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         onTap: () {
           if (videoDetailController.isVod) {
             (introController as VodIntroController).showEpisodePanel();
+            return;
+          }
+          if (videoDetailController.isUgreen) {
+            (introController as UgreenIntroController).showEpisodePanel();
             return;
           }
           if (videoDetailController.isFileSource) {
@@ -760,6 +767,51 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         },
       ),
 
+      /// 音轨
+      BottomControlType.audioTrack => Obx(() {
+        final UgreenIntroController? ugreenIntro =
+            introController is UgreenIntroController
+            ? introController as UgreenIntroController
+            : null;
+        final audios = ugreenIntro?.transcode.value?.audios;
+        if (ugreenIntro == null || audios == null || audios.length <= 1) {
+          return const SizedBox.shrink();
+        }
+        final current = ugreenIntro.audioIndex.value;
+        return PopupMenuButton<int>(
+          tooltip: '音轨',
+          requestFocus: false,
+          initialValue: current,
+          color: Colors.black.withValues(alpha: 0.8),
+          itemBuilder: (context) {
+            return [
+              ...audios.mapIndexed((i, e) {
+                return PopupMenuItem<int>(
+                  value: i,
+                  height: 35,
+                  onTap: () => ugreenIntro.switchAudio(i),
+                  child: Text(
+                    e.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                );
+              }),
+            ];
+          },
+          child: SizedBox(
+            width: widgetWidth,
+            height: 30,
+            child: const Icon(
+              Icons.audiotrack,
+              size: 22,
+              color: Colors.white,
+            ),
+          ),
+        );
+      }),
+
       /// 播放速度
       BottomControlType.speed => Obx(
         () => PopupMenuButton<double>(
@@ -797,6 +849,48 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
       BottomControlType.qa => Obx(
         () {
+          if (isUgreen) {
+            final ugreenIntro = introController as UgreenIntroController;
+            final current = ugreenIntro.currentQuality;
+            if (current == null || ugreenIntro.qualities.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return PopupMenuButton<int>(
+              tooltip: '画质',
+              requestFocus: false,
+              initialValue: ugreenIntro.qualityIndex.value,
+              color: Colors.black.withValues(alpha: 0.8),
+              itemBuilder: (context) {
+                return List.generate(
+                  ugreenIntro.qualities.length,
+                  (index) {
+                    return PopupMenuItem<int>(
+                      height: 35,
+                      padding: const EdgeInsets.only(left: 15, right: 10),
+                      value: index,
+                      onTap: () => ugreenIntro.switchQuality(index),
+                      child: Text(
+                        ugreenIntro.qualities[index].name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  current.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+            );
+          }
           final VideoQuality? currentVideoQa =
               videoDetailController.currentVideoQa.value;
           if (currentVideoQa == null) {
@@ -899,17 +993,24 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     final flag =
         isFullScreen || plPlayerController.isDesktopPip || maxWidth >= 500;
     final List<BottomControlType> userSpecifyItemRight = [
-      if (isNotVod && isNotFileSource && plPlayerController.showDmChart)
+      if (!isVod &&
+          !isUgreen &&
+          isNotFileSource &&
+          plPlayerController.showDmChart)
         .dmChart,
       if (plPlayerController.enableSuperResolution) .superResolution,
-      if (isNotVod && isNotFileSource && plPlayerController.showViewPoints)
+      if (!isVod &&
+          !isUgreen &&
+          isNotFileSource &&
+          plPlayerController.showViewPoints)
         .viewPoints,
       if (isNotFileSource && anySeason) .episode,
       if (flag) .fit,
-      if (isNotVod && isNotFileSource) .aiTranslate,
-      if (isNotVod) .subtitle,
+      if (!isVod && !isUgreen && isNotFileSource) .aiTranslate,
+      if (!isVod && !isUgreen) .subtitle,
+      if (isUgreen) .audioTrack,
       .speed,
-      if (isNotVod && isNotFileSource && flag) .qa,
+      if (!isVod && isUgreen && isNotFileSource && flag) .qa,
       if (!plPlayerController.isDesktopPip) .fullscreen,
     ];
     return PlayerBar(

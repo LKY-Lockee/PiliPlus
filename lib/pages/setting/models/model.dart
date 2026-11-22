@@ -206,6 +206,22 @@ class SwitchModel extends SettingsModel {
   );
 }
 
+class SettingsDivider extends SettingsModel {
+  @override
+  String? get title => null;
+
+  @override
+  String get effectiveTitle => '';
+
+  @override
+  String? get effectiveSubtitle => '';
+
+  @override
+  Widget get widget => const Divider(height: 1);
+
+  const SettingsDivider();
+}
+
 SettingsModel getBanWordModel({
   required String title,
   required String key,

@@ -41,6 +41,7 @@ import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/pages/video/download_panel/view.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
+import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/medialist/view.dart';
 import 'package:PiliPlus/pages/video/note/view.dart';
@@ -106,6 +107,7 @@ class VideoDetailController extends GetxController
   @override
   late bool isFileSource;
   late bool isVod;
+  late bool isUgreen;
   late bool _mediaDesc = false;
   late final RxList<MediaListItemModel> mediaList = <MediaListItemModel>[].obs;
   late String watchLaterTitle;
@@ -158,14 +160,15 @@ class VideoDetailController extends GetxController
   // 预设的解码格式
   late List<VideoDecodeFormatType> preferCodecs = Pref.preferCodecs;
 
-  bool get showReply => isFileSource || isVod
+  bool get showReply => isFileSource || isVod || isUgreen
       ? false
       : isUgc
       ? plPlayerController.showVideoReply
       : plPlayerController.showBangumiReply;
 
-  bool get showRelatedVideo =>
-      isFileSource || isVod ? false : plPlayerController.showRelatedVideo;
+  bool get showRelatedVideo => isFileSource || isVod || isUgreen
+      ? false
+      : plPlayerController.showRelatedVideo;
 
   ScrollController? introScrollCtr;
   ScrollController get effectiveIntroScrollCtr =>
@@ -392,8 +395,10 @@ class VideoDetailController extends GetxController
 
     sourceType = args['sourceType'] ?? SourceType.normal;
     isFileSource = sourceType == SourceType.file;
+    isUgreen = sourceType == SourceType.ugreen;
     isVod = sourceType == SourceType.vod;
-    isPlayAll = sourceType != SourceType.normal && !isFileSource && !isVod;
+    isPlayAll =
+        sourceType != SourceType.normal && !isFileSource && !isVod && !isUgreen;
     if (isFileSource) {
       initFileSource(args['entry']);
     } else if (isPlayAll) {
@@ -736,7 +741,7 @@ class VideoDetailController extends GetxController
     if (seek == .zero) seek = null;
     seek ??= getFirstSegment();
     await plPlayerController.setDataSource(
-      isVod
+      isVod || isUgreen
           ? NetworkSource(videoSource: videoUrl!, headers: playHeaders)
           : isFileSource
           ? FileSource(
@@ -750,26 +755,27 @@ class VideoDetailController extends GetxController
               audioSource: audioUrl,
             ),
       seekTo: seek,
-      duration: isVod
+      duration: isVod || isUgreen
           ? null
           : data.timeLength == null
           ? null
           : Duration(milliseconds: data.timeLength!),
       isVertical: isVertical.value,
-      aid: isVod ? null : aid,
-      bvid: isVod ? null : bvid,
-      cid: isVod ? null : cid.value,
+      aid: isVod || isUgreen ? null : aid,
+      bvid: isVod || isUgreen ? null : bvid,
+      cid: isVod || isUgreen ? null : cid.value,
       autoplay: autoplay ?? _autoPlay.value,
       epid: isUgc ? null : epId,
       seasonId: isUgc ? null : seasonId,
       pgcType: isUgc ? null : pgcType,
+      allowSuperResolution: isVod || isUgreen,
       videoType: videoType,
       onInit: () {
         videoState.value = true;
         setSubtitle(vttSubtitlesIndex.value);
       },
-      width: isVod ? null : firstVideo.width,
-      height: isVod ? null : firstVideo.height,
+      width: isVod || isUgreen ? null : firstVideo.width,
+      height: isVod || isUgreen ? null : firstVideo.height,
       volume: volume,
       autoFullScreenFlag: autoFullScreenFlag,
     );
@@ -840,6 +846,9 @@ class VideoDetailController extends GetxController
   }) async {
     if (isFileSource) {
       return initPlayerIfNeeded(autoFullScreenFlag);
+    }
+    if (isUgreen) {
+      return _queryUgreenVideoUrl(autoFullScreenFlag: autoFullScreenFlag);
     }
     if (isVod) {
       return _queryVodVideoUrl(autoFullScreenFlag: autoFullScreenFlag);
@@ -1042,6 +1051,37 @@ class VideoDetailController extends GetxController
       autoPlay = false;
       videoState.value = false;
       SmartDialog.showToast('点播播放失败：$e');
+    }
+    isQuerying = false;
+  }
+
+  Future<void> _queryUgreenVideoUrl({
+    bool autoFullScreenFlag = false,
+  }) async {
+    if (isQuerying) {
+      return;
+    }
+    final intro = Get.find<UgreenIntroController>(tag: heroTag);
+    isQuerying = true;
+    try {
+      await intro.loadDetail();
+      if (isClosed) {
+        isQuerying = false;
+        return;
+      }
+      if (intro.episodes.isEmpty) {
+        autoPlay = false;
+        videoState.value = false;
+        isQuerying = false;
+        return;
+      }
+      await intro.playCurrent(
+        autoFullScreenFlag: autoFullScreenFlag,
+      );
+    } catch (e) {
+      autoPlay = false;
+      videoState.value = false;
+      SmartDialog.showToast('绿联播放失败：$e');
     }
     isQuerying = false;
   }
@@ -1272,6 +1312,10 @@ class VideoDetailController extends GetxController
   void makeHeartBeat() {
     if (isVod) {
       Get.find<VodIntroController>(tag: heroTag).saveRecord();
+      return;
+    }
+    if (isUgreen) {
+      Get.find<UgreenIntroController>(tag: heroTag).saveProgress(force: true);
       return;
     }
     if (plPlayerController.enableHeart &&

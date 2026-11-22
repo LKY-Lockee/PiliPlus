@@ -35,6 +35,7 @@ import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/action_item.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/menu_row.dart';
+import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/widgets/header_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
@@ -357,6 +358,8 @@ class HeaderControlState extends State<HeaderControl>
     super.initState();
     if (isVod) {
       introController = Get.find<VodIntroController>(tag: heroTag);
+    } else if (videoDetailCtr.isUgreen) {
+      introController = Get.find<UgreenIntroController>(tag: heroTag);
     } else if (isFileSource) {
       introController = Get.find<LocalIntroController>(tag: heroTag);
     } else if (videoDetailCtr.isUgc) {
@@ -381,7 +384,7 @@ class HeaderControlState extends State<HeaderControl>
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 14),
               children: [
-                if (!isVod) ...[
+                if (!isVod && !isUgreen) ...[
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -451,7 +454,7 @@ class HeaderControlState extends State<HeaderControl>
                         )
                       : null,
                 ),
-                if (!isFileSource && !isVod)
+                if (!isFileSource)
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -514,7 +517,7 @@ class HeaderControlState extends State<HeaderControl>
                         ),
                       ),
                     ),
-                if (!isFileSource && !isVod)
+                if (!isFileSource && !isVod && !isUgreen)
                   ListTile(
                     dense: true,
                     title: const Text('CDN 设置', style: titleStyle),
@@ -622,7 +625,7 @@ class HeaderControlState extends State<HeaderControl>
                     ],
                   ),
                 ),
-                if (!isFileSource && !isVod) ...[
+                if (!isFileSource && !isVod && !isUgreen) ...[
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -681,7 +684,7 @@ class HeaderControlState extends State<HeaderControl>
                   descPosType: .subtitle,
                   descStyle: subTitleStyle,
                 ),
-                if (!isVod) ...[
+                if (!isVod && !isUgreen) ...[
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -790,7 +793,7 @@ class HeaderControlState extends State<HeaderControl>
                     leading: const Icon(Icons.info_outline, size: 20),
                     onTap: () => showPlayerInfo(context, player: player),
                   ),
-                if (!isVod)
+                if (!isVod && !isUgreen)
                   ListTile(
                     dense: true,
                     onTap: () {
@@ -1665,6 +1668,7 @@ class HeaderControlState extends State<HeaderControl>
 
   late final isFileSource = videoDetailCtr.isFileSource;
   late final isVod = videoDetailCtr.isVod;
+  late final isUgreen = videoDetailCtr.isUgreen;
 
   static const btnWidth = 42.0;
   static const btnHeight = 34.0;
@@ -1807,7 +1811,7 @@ class HeaderControlState extends State<HeaderControl>
                       ),
                     );
                   }),
-                if (!isVod) ...[
+                if (!isVod && !isUgreen) ...[
                   if (!isFileSource) ...[
                     if (!isFSOrPip) ...[
                       if (videoDetailCtr.isUgc)

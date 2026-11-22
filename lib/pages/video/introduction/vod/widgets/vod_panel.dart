@@ -70,7 +70,7 @@ class _VodPanelState extends State<VodPanel> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('合集 '),
+              const Text('剧集 '),
               Expanded(
                 child: Text(
                   ' 正在播放：${currEpisode?.name ?? '未播放'}',
