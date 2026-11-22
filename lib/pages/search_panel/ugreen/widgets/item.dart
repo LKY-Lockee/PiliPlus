@@ -16,6 +16,7 @@ class SearchUgreenItem extends StatelessWidget {
     this.meta,
     this.coverWidth = 111,
     this.coverHeight = 148,
+    this.onTap,
   });
 
   final String cover;
@@ -25,16 +26,17 @@ class SearchUgreenItem extends StatelessWidget {
   final String? meta;
   final double coverWidth;
   final double coverHeight;
+  final VoidCallback? onTap;
 
   void onLongPress() => showPgcCover(title: title, cover: cover);
 
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(fontSize: 13);
+    const TextStyle style = TextStyle(fontSize: 13);
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
         child: Padding(

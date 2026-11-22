@@ -32,6 +32,7 @@ class BottomControl extends StatelessWidget {
 
   void onDragUpdate(ThumbDragDetails duration) {
     if (!videoDetailController.isVod &&
+        !videoDetailController.isUgreen &&
         !controller.isFileSource &&
         controller.showSeekPreview) {
       controller.updatePreviewIndex(duration.seconds);

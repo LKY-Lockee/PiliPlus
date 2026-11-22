@@ -28,6 +28,7 @@ enum SourceType {
   ),
   file,
   vod,
+  ugreen,
   ;
 
   final int? mediaType;

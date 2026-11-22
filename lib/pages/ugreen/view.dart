@@ -9,6 +9,7 @@ import 'package:PiliPlus/pages/ugreen/controller.dart';
 import 'package:PiliPlus/pages/ugreen/widgets/ugreen_card_v.dart';
 import 'package:PiliPlus/pages/ugreen/widgets/ugreen_card_wide.dart';
 import 'package:PiliPlus/utils/grid.dart';
+import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -168,6 +169,11 @@ class _UgreenPageState extends State<UgreenPage>
         score: item.score,
         year: item.year,
         localCount: item.localCount,
+        ugVideoInfoId: item.ugVideoInfoId,
+        mediaLibSetId: item.mediaLibSetId,
+        type: item.type,
+        initialFilePath: item.recentlyPlayedFilePath,
+        initialEpisode: item.episode,
       ),
     );
     addRail(
@@ -183,6 +189,9 @@ class _UgreenPageState extends State<UgreenPage>
         score: item.score,
         year: item.year,
         localCount: item.localCount,
+        ugVideoInfoId: item.ugVideoInfoId,
+        mediaLibSetId: item.mediaLibSetId,
+        type: item.type,
       ),
       onMore: () => Get.toNamed(
         '/fav',
@@ -202,6 +211,9 @@ class _UgreenPageState extends State<UgreenPage>
         score: item.score,
         year: item.year,
         localCount: item.localCount,
+        ugVideoInfoId: item.ugVideoInfoId,
+        mediaLibSetId: item.mediaLibSetId,
+        type: item.type,
       ),
     );
     addRail(
@@ -241,6 +253,9 @@ class _UgreenPageState extends State<UgreenPage>
         score: item.score,
         year: item.year,
         localCount: item.localCount,
+        ugVideoInfoId: item.ugVideoInfoId,
+        mediaLibSetId: item.mediaLibSetId,
+        type: item.type,
       ),
     );
     addRail(
@@ -256,6 +271,9 @@ class _UgreenPageState extends State<UgreenPage>
         score: item.score,
         year: item.year,
         localCount: item.localCount,
+        ugVideoInfoId: item.ugVideoInfoId,
+        mediaLibSetId: item.mediaLibSetId,
+        type: item.type,
       ),
     );
     addRail(
@@ -271,6 +289,9 @@ class _UgreenPageState extends State<UgreenPage>
         score: item.score,
         year: item.year,
         localCount: item.localCount,
+        ugVideoInfoId: item.ugVideoInfoId,
+        mediaLibSetId: item.mediaLibSetId,
+        type: item.type,
       ),
     );
     return sections;
@@ -283,6 +304,11 @@ class _UgreenPageState extends State<UgreenPage>
     required num score,
     required int year,
     required int localCount,
+    required int ugVideoInfoId,
+    required int mediaLibSetId,
+    required int type,
+    String? initialFilePath,
+    int? initialEpisode,
   }) {
     return UgreenCardV(
       title: title,
@@ -293,6 +319,13 @@ class _UgreenPageState extends State<UgreenPage>
       score: score <= 0 ? null : '${score.toStringAsFixed(1)} 分',
       badge: year <= 0 ? null : year.toString(),
       subtitle: localCount <= 0 ? null : '共$localCount集',
+      onTap: () => PageUtils.toUgreenPage(
+        ugVideoInfoId: ugVideoInfoId,
+        mediaLibSetId: mediaLibSetId,
+        type: type,
+        initialFilePath: initialFilePath,
+        initialEpisode: initialEpisode,
+      ),
     );
   }
 

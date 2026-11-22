@@ -40,6 +40,8 @@ import 'package:PiliPlus/pages/video/introduction/ugc/view.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/page.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/season.dart'
     as ugc;
+import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
+import 'package:PiliPlus/pages/video/introduction/ugreen/view.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/view.dart';
 import 'package:PiliPlus/pages/video/member/controller.dart';
@@ -102,9 +104,15 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   late final PgcIntroController pgcIntroController;
   late final LocalIntroController localIntroController;
   late final VodIntroController vodIntroController;
+  late final UgreenIntroController ugreenIntroController;
 
   CommonIntroController _initIntroCtr() {
-    if (videoDetailController.isVod) {
+    if (videoDetailController.isUgreen) {
+      return ugreenIntroController = Get.put(
+        UgreenIntroController(),
+        tag: heroTag,
+      );
+    } else if (videoDetailController.isVod) {
       return vodIntroController = Get.put(VodIntroController(), tag: heroTag);
     } else if (videoDetailController.isFileSource) {
       return localIntroController = Get.put(
@@ -138,6 +146,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   bool get _shouldShowSeasonPanel {
     if (videoDetailController.isFileSource ||
         videoDetailController.isVod ||
+        videoDetailController.isUgreen ||
         isPortrait ||
         !videoDetailController.plPlayerController.horizontalSeasonPanel) {
       return false;
@@ -354,7 +363,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       tag: videoDetailController.heroTag,
     );
 
-    if (!videoDetailController.isFileSource && !videoDetailController.isVod) {
+    if (!videoDetailController.isFileSource &&
+        !videoDetailController.isVod &&
+        !videoDetailController.isUgreen) {
       if (videoDetailController.isUgc) {
         ugcIntroController
           ..cancelTimer()
@@ -936,7 +947,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
               ),
             ),
             if (!videoDetailController.isFileSource &&
-                !videoDetailController.isVod)
+                !videoDetailController.isVod &&
+                !videoDetailController.isUgreen)
               Offstage(
                 offstage: isFullScreen,
                 child: SizedBox(
@@ -966,7 +978,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                     introText: '相关视频',
                     showIntro:
                         videoDetailController.isFileSource ||
-                            videoDetailController.isVod
+                            videoDetailController.isVod ||
+                            videoDetailController.isUgreen
                         ? true
                         : showIntro,
                   ),
@@ -976,6 +989,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                       children: [
                         if (videoDetailController.isVod)
                           vodIntroPanel()
+                        else if (videoDetailController.isUgreen)
+                          ugreenIntroPanel()
                         else if (videoDetailController.isFileSource)
                           localIntroPanel()
                         else if (showIntro)
@@ -1181,7 +1196,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       shadows: shadows,
     ),
     itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-      if (!videoDetailController.isVod) ...[
+      if (!videoDetailController.isVod && !videoDetailController.isUgreen) ...[
         PopupMenuItem(
           onTap: introController.viewLater,
           child: const Text('稍后再看'),
@@ -1205,12 +1220,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ),
       if (!videoDetailController.isFileSource &&
           !videoDetailController.isVod &&
+          !videoDetailController.isUgreen &&
           videoDetailController.isUgc)
         PopupMenuItem(
           onTap: videoDetailController.toAudioPage,
           child: const Text('听音频'),
         ),
-      if (!videoDetailController.isVod)
+      if (!videoDetailController.isVod && !videoDetailController.isUgreen)
         PopupMenuItem(
           onTap: () {
             if (!Accounts.main.isLogin) {
@@ -1256,7 +1272,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                 heroTag: heroTag,
               ),
               danmuWidget:
-                  videoDetailController.isVod || isPipMode && pipNoDanmaku
+                  videoDetailController.isVod ||
+                      videoDetailController.isUgreen ||
+                      isPipMode && pipNoDanmaku
                   ? null
                   : Obx(
                       () => PlDanmaku(
@@ -1328,7 +1346,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       if (showIntro)
         videoDetailController.isFileSource
             ? '离线视频'
-            : videoDetailController.isVod
+            : videoDetailController.isVod || videoDetailController.isUgreen
             ? "简介"
             : introText ?? '简介',
       if (videoDetailController.showReply) '评论',
@@ -1425,7 +1443,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                   ),
                 ),
               ),
-            if (!videoDetailController.isVod) ...[
+            if (!videoDetailController.isVod &&
+                !videoDetailController.isUgreen) ...[
               SizedBox(
                 height: 32,
                 child: TextButton(
@@ -1682,6 +1701,29 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     );
   }
 
+  Widget ugreenIntroPanel({
+    bool needCtr = true,
+    bool isLandscape = false,
+  }) {
+    return CustomScrollView(
+      controller: needCtr
+          ? videoDetailController.effectiveIntroScrollCtr
+          : null,
+      physics: !needCtr ? platformAlwaysClampingPhysics : null,
+      key: const PageStorageKey(CommonIntroController),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.only(bottom: padding.bottom + 100),
+          sliver: UgreenIntroPage(
+            key: videoIntroKey,
+            heroTag: heroTag,
+            isLandscape: isLandscape,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget videoIntro({
     double? width,
     double? height,
@@ -1694,6 +1736,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     }
     if (videoDetailController.isVod) {
       return vodIntroPanel(needCtr: needCtr, isLandscape: !isPortrait);
+    }
+    if (videoDetailController.isUgreen) {
+      return ugreenIntroPanel(needCtr: needCtr, isLandscape: !isPortrait);
     }
 
     Widget child = CustomScrollView(

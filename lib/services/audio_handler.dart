@@ -12,6 +12,7 @@ import 'package:PiliPlus/pages/common/common_intro_controller.dart';
 import 'package:PiliPlus/pages/video/introduction/local/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
+import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/utils/android/bindings.g.dart';
@@ -81,6 +82,7 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
           UgcIntroController => Get.find<UgcIntroController>(tag: tag),
           PgcIntroController => Get.find<PgcIntroController>(tag: tag),
           LocalIntroController => Get.find<LocalIntroController>(tag: tag),
+          UgreenIntroController => Get.find<UgreenIntroController>(tag: tag),
           _ => throw UnimplementedError(playOwner.type.toString()),
         };
       } catch (_) {

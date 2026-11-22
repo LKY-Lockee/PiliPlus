@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:PiliPlus/common/widgets/marquee.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_info_model/season.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:material_ui/material_ui.dart';
@@ -57,12 +58,10 @@ class SeasonPanel extends StatelessWidget {
                   padding: const .symmetric(horizontal: 8),
                   child: Align(
                     alignment: .centerLeft,
-                    child: Text(
+                    child: MarqueeText(
                       item.seasonTitle!,
-                      maxLines: 1,
-                      overflow: .ellipsis,
+                      spacing: 16,
                       style: TextStyle(
-                        height: 1,
                         fontSize: 13,
                         color: isCurr
                             ? colorScheme.primary

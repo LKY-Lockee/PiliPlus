@@ -9,6 +9,7 @@ import 'package:PiliPlus/pages/search_panel/ugreen/controller.dart';
 import 'package:PiliPlus/pages/search_panel/ugreen/widgets/item.dart';
 import 'package:PiliPlus/pages/search_panel/view.dart';
 import 'package:PiliPlus/utils/grid.dart';
+import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart'
     hide SliverGridDelegateWithMaxCrossAxisExtent;
@@ -161,6 +162,11 @@ class _SearchUgreenPanelState
           item.year > 0 ? '${item.year}' : null,
           item.localCount > 0 ? '共${item.localCount}集' : null,
         ]),
+        onTap: () => PageUtils.toUgreenPage(
+          ugVideoInfoId: item.ugVideoInfoId,
+          mediaLibSetId: item.mediaLibSetId,
+          type: item.type,
+        ),
       ),
       UgreenSearchPeopleEntry(:final item) => SearchUgreenItem(
         cover: controller.coverUrl(posterPath: item.avatarUrl),
@@ -190,6 +196,12 @@ class _SearchUgreenPanelState
         subtitle: item.clarityShow.isEmpty ? null : item.clarityShow,
         meta: item.folderPath.isNotEmpty ? item.folderPath : item.filePath,
         coverWidth: 148 * Style.aspectRatio,
+        onTap: () => PageUtils.toUgreenPage(
+          ugVideoInfoId: item.ugVideoInfoId,
+          mediaLibSetId: item.mediaLibSetId,
+          type: item.videoType,
+          initialFilePath: item.filePath,
+        ),
       ),
     };
   }

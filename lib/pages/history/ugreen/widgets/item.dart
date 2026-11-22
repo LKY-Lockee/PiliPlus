@@ -7,6 +7,7 @@ import 'package:PiliPlus/models/common/badge_type.dart';
 import 'package:PiliPlus/models_new/history/history_ugreen/list.dart';
 import 'package:PiliPlus/pages/common/multi_select/base.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
+import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -39,7 +40,18 @@ class HistoryUgreenItem extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        onTap: enableMultiSelect ? () => ctr.onSelect(item) : () {},
+        onTap: enableMultiSelect
+            ? () => ctr.onSelect(item)
+            : () {
+                PageUtils.toUgreenPage(
+                  ugVideoInfoId: item.videoInfo.ugVideoInfoId,
+                  mediaLibSetId: item.videoInfo.mediaLibSetId,
+                  type: item.videoInfo.type,
+                  initialFilePath: item.playStatus.recentlyPlayedFilePath,
+                  initialEpisodeId: item.playStatus.ugTelevisionEpisodeId,
+                  initialEpisode: item.playStatus.episode,
+                );
+              },
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
         child: Stack(

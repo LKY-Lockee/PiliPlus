@@ -4,6 +4,7 @@ import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/models/common/badge_type.dart';
 import 'package:PiliPlus/models_new/fav/fav_ugreen/list.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
+import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:material_ui/material_ui.dart';
 
 class FavUgreenItem extends StatelessWidget {
@@ -27,7 +28,16 @@ class FavUgreenItem extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           InkWell(
-            onTap: () {},
+            onTap: () {
+              PageUtils.toUgreenPage(
+                ugVideoInfoId: item.videoInfo.ugVideoInfoId,
+                mediaLibSetId: item.videoInfo.mediaLibSetId,
+                type: item.videoInfo.type,
+                initialFilePath: item.playStatus.recentlyPlayedFilePath,
+                initialEpisodeId: item.playStatus.ugTelevisionEpisodeId,
+                initialEpisode: item.playStatus.episode,
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: Style.safeSpace,

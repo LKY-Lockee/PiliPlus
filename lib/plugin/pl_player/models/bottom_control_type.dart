@@ -6,6 +6,7 @@ enum BottomControlType {
   episode,
   fit,
   subtitle,
+  audioTrack,
   speed,
   fullscreen,
   viewPoints,

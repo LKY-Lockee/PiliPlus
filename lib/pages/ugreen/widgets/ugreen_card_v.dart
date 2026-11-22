@@ -15,6 +15,7 @@ class UgreenCardV extends StatelessWidget {
     this.score,
     this.badge,
     this.subtitle,
+    this.onTap,
   });
 
   final String title;
@@ -22,6 +23,7 @@ class UgreenCardV extends StatelessWidget {
   final String? score;
   final String? badge;
   final String? subtitle;
+  final VoidCallback? onTap;
 
   void onLongPress() => showPgcCover(title: title, cover: cover);
 
@@ -33,7 +35,7 @@ class UgreenCardV extends StatelessWidget {
         borderRadius: Style.mdRadius,
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
-        onTap: () {},
+        onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
