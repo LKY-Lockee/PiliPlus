@@ -5,6 +5,7 @@ import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
 import 'package:PiliPlus/common/widgets/loading_widget/loading_widget.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models/common/fav_type.dart';
+import 'package:PiliPlus/pages/history/ugreen/view.dart';
 import 'package:PiliPlus/pages/ugreen/controller.dart';
 import 'package:PiliPlus/pages/ugreen/widgets/ugreen_card_v.dart';
 import 'package:PiliPlus/pages/ugreen/widgets/ugreen_card_wide.dart';
@@ -187,6 +188,10 @@ class _UgreenPageState extends State<UgreenPage>
         initialEpisode: item.episode,
       ),
       onRefresh: controller.refreshHome,
+      onMore: () => Get.toNamed(
+        '/history',
+        arguments: HistoryUgreenPage,
+      ),
     );
     addRail(
       title: '我的收藏',

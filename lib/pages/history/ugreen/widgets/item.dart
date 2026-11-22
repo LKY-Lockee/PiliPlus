@@ -78,6 +78,7 @@ class HistoryUgreenItem extends StatelessWidget {
                               src: cover,
                               width: maxWidth,
                               height: maxHeight,
+                              cacheWidth: true,
                             ),
                             if (hasDuration)
                               PBadge(
@@ -190,15 +191,18 @@ class HistoryUgreenItem extends StatelessWidget {
             maxLines: item.playStatus.tvName.isEmpty ? 2 : 1,
             overflow: TextOverflow.ellipsis,
           ),
-          Text(
-            "第${item.playStatus.episode}集 ${item.playStatus.tvName}",
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.outline,
+          if (item.playStatus.episode > 0)
+            Text(
+              item.playStatus.tvName.startsWith("第")
+                  ? item.playStatus.tvName
+                  : "第${item.playStatus.episode}集 ${item.playStatus.tvName}",
+              style: TextStyle(
+                fontSize: 13,
+                color: theme.colorScheme.outline,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
           const Spacer(),
           if (item.videoInfo.localCount > 0)
             Text(
