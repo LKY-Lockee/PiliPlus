@@ -59,12 +59,12 @@ class _HistoryUgreenPageState extends State<HistoryUgreenPage>
                   final item = response[index];
                   return HistoryUgreenItem(
                     item: item,
-                    cover: item.playStatus.coverPath.isNullOrEmpty
-                        ? _historyController.coverUrl(
-                            categoryId: item.videoInfo.categoryId,
-                            posterPath: item.videoInfo.posterPath,
-                          )
-                        : item.playStatus.coverPath,
+                    cover: _historyController.coverUrl(
+                      categoryId: item.videoInfo.categoryId,
+                      posterPath: item.playStatus.coverPath.isNullOrEmpty
+                          ? item.videoInfo.posterPath
+                          : item.playStatus.coverPath,
+                    ),
                     ctr: _historyController,
                     onDelete: () => _historyController.deleteItem(item),
                   );
