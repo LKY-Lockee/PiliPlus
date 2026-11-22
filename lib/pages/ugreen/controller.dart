@@ -30,24 +30,13 @@ class UgreenController extends GetxController with ScrollOrRefreshMixin {
       LoadingState<UgreenAllData>.loading().obs;
 
   Worker? _sessionWorker;
-  Worker? _historyWorker;
-  Worker? _favoriteWorker;
   bool _refreshing = false;
+  bool _refreshingHome = false;
 
   @override
   void onInit() {
     super.onInit();
     _sessionWorker = ever(service.session, (_) {
-      if (!isClosed) {
-        onRefresh();
-      }
-    });
-    _historyWorker = ever(service.historyRevision, (_) {
-      if (!isClosed) {
-        onRefresh();
-      }
-    });
-    _favoriteWorker = ever(service.favoriteRevision, (_) {
       if (!isClosed) {
         onRefresh();
       }
@@ -62,71 +51,89 @@ class UgreenController extends GetxController with ScrollOrRefreshMixin {
     }
     _refreshing = true;
     try {
-      homeState.value = LoadingState.loading();
-      folderState.value = LoadingState.loading();
-      mediaLibState.value = LoadingState.loading();
-      movieState.value = LoadingState.loading();
-      tvState.value = LoadingState.loading();
-      otherState.value = LoadingState.loading();
-      try {
-        if (service.isLogin) {
-          await service.checkSession();
-        }
-        final current = service.session.value;
-        if (current == null) {
-          const error = Error('请先登录绿联云');
-          homeState.value = error;
-          folderState.value = error;
-          mediaLibState.value = error;
-          movieState.value = error;
-          tvState.value = error;
-          otherState.value = error;
-          return;
-        }
-        final homeFuture = UgreenHomeHttp.homepage(current);
-        final folderFuture = UgreenMediaHttp.folders(current);
-        final mediaLibFuture = UgreenMediaHttp.mediaLibraries(current);
-        final movieFuture = UgreenMediaHttp.allVideos(
-          current,
-          classification: -102,
-        );
-        final tvFuture = UgreenMediaHttp.allVideos(
-          current,
-          classification: -103,
-        );
-        final otherFuture = UgreenMediaHttp.allVideos(
-          current,
-          classification: -104,
-        );
-        await Future.wait([
-          _apply(homeState, homeFuture),
-          _apply(folderState, folderFuture),
-          _apply(mediaLibState, mediaLibFuture),
-          _apply(movieState, movieFuture),
-          _apply(tvState, tvFuture),
-          _apply(otherState, otherFuture),
-        ]);
-      } catch (e) {
-        final error = Error('加载失败: $e');
+      if (service.isLogin) {
+        await service.checkSession();
+      }
+      final current = service.session.value;
+      if (current == null) {
+        const error = Error('请先登录绿联云');
         homeState.value = error;
         folderState.value = error;
         mediaLibState.value = error;
         movieState.value = error;
         tvState.value = error;
         otherState.value = error;
+        return;
       }
+      final homeFuture = UgreenHomeHttp.homepage(current);
+      final folderFuture = UgreenMediaHttp.folders(current);
+      final mediaLibFuture = UgreenMediaHttp.mediaLibraries(current);
+      final movieFuture = UgreenMediaHttp.allVideos(
+        current,
+        classification: -102,
+      );
+      final tvFuture = UgreenMediaHttp.allVideos(
+        current,
+        classification: -103,
+      );
+      final otherFuture = UgreenMediaHttp.allVideos(
+        current,
+        classification: -104,
+      );
+      await Future.wait([
+        homeFuture,
+        folderFuture,
+        mediaLibFuture,
+        movieFuture,
+        tvFuture,
+        otherFuture,
+      ]);
+      if (isClosed) {
+        return;
+      }
+      homeState.value = await homeFuture;
+      folderState.value = await folderFuture;
+      mediaLibState.value = await mediaLibFuture;
+      movieState.value = await movieFuture;
+      tvState.value = await tvFuture;
+      otherState.value = await otherFuture;
+    } catch (e) {
+      final error = Error('加载失败: $e');
+      homeState.value = error;
+      folderState.value = error;
+      mediaLibState.value = error;
+      movieState.value = error;
+      tvState.value = error;
+      otherState.value = error;
     } finally {
       _refreshing = false;
     }
   }
 
-  Future<void> _apply<T>(
-    Rx<LoadingState<T>> state,
-    Future<LoadingState<T>> future,
-  ) async {
-    final result = await future;
-    if (!isClosed) {
-      state.value = result;
+  Future<void> refreshHome() async {
+    if (_refreshingHome) {
+      return;
+    }
+    final current = service.session.value;
+    if (current == null) {
+      return;
+    }
+    _refreshingHome = true;
+    try {
+      final result = await UgreenHomeHttp.homepage(current);
+      if (isClosed) {
+        return;
+      }
+      if (result is Success<UgreenHomeData>) {
+        homeState.value = result;
+      } else if (result is Error) {
+        result.toast();
+        if (result.code == 1024) {
+          service.logout();
+        }
+      }
+    } finally {
+      _refreshingHome = false;
     }
   }
 
@@ -148,8 +155,6 @@ class UgreenController extends GetxController with ScrollOrRefreshMixin {
   @override
   void onClose() {
     _sessionWorker?.dispose();
-    _historyWorker?.dispose();
-    _favoriteWorker?.dispose();
     scrollController.dispose();
     super.onClose();
   }

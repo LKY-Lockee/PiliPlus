@@ -93,7 +93,6 @@ class FavUgreenController
       type: item.videoInfo.type,
     );
     if (result.isSuccess) {
-      service.favoriteRevision.value++;
       final data = loadingState.value.dataOrNull;
       if (data != null) {
         data.remove(item);

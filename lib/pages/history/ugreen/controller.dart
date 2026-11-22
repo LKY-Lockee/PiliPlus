@@ -122,9 +122,6 @@ class HistoryUgreenController
       current,
       delType: 1,
     );
-    if (result.isSuccess) {
-      service.historyRevision.value++;
-    }
     return result;
   }
 
@@ -150,7 +147,6 @@ class HistoryUgreenController
     );
     SmartDialog.dismiss();
     if (result.isSuccess) {
-      service.historyRevision.value++;
       afterDelete(items);
       SmartDialog.showToast('已删除');
     } else {

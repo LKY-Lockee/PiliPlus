@@ -19,9 +19,6 @@ class UgreenService extends GetxService {
 
   final Rx<UgreenSession?> session = Rx<UgreenSession?>(null);
 
-  final RxInt historyRevision = 0.obs;
-  final RxInt favoriteRevision = 0.obs;
-
   late String _clientId;
   String? _qrBid;
 

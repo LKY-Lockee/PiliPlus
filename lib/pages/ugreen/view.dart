@@ -93,6 +93,7 @@ class _UgreenPageState extends State<UgreenPage>
       required double coverAspectRatio,
       required List<U> Function(T value) items,
       required Widget Function(U item) itemBuilder,
+      VoidCallback? onRefresh,
       VoidCallback? onMore,
     }) {
       if (state is! Success<T>) {
@@ -106,24 +107,34 @@ class _UgreenPageState extends State<UgreenPage>
         ..add(
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.only(
-                top: 10,
-                bottom: 10,
-                left: 16,
-                right: 10,
-              ),
+              padding: const EdgeInsets.only(left: 16),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleMedium,
+                    ),
                   ),
+                  const Spacer(),
+                  if (onRefresh != null)
+                    IconButton(
+                      tooltip: '刷新',
+                      onPressed: onRefresh,
+                      icon: const Icon(
+                        Icons.refresh,
+                        size: 20,
+                      ),
+                    ),
                   if (onMore != null)
-                    moreTextButton(
-                      text: '查看全部',
-                      onTap: onMore,
-                      color: theme.colorScheme.secondary,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: moreTextButton(
+                        text: '查看全部',
+                        onTap: onMore,
+                        color: theme.colorScheme.secondary,
+                      ),
                     ),
                 ],
               ),
@@ -175,6 +186,7 @@ class _UgreenPageState extends State<UgreenPage>
         initialFilePath: item.recentlyPlayedFilePath,
         initialEpisode: item.episode,
       ),
+      onRefresh: controller.refreshHome,
     );
     addRail(
       title: '我的收藏',
@@ -193,6 +205,7 @@ class _UgreenPageState extends State<UgreenPage>
         mediaLibSetId: item.mediaLibSetId,
         type: item.type,
       ),
+      onRefresh: controller.refreshHome,
       onMore: () => Get.toNamed(
         '/fav',
         arguments: FavTabType.ugreen.index,

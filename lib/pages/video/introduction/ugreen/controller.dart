@@ -874,9 +874,6 @@ class UgreenIntroController extends CommonIntroController {
       );
       if (res is Success) {
         _lastReportedSeconds = seconds;
-        if (force) {
-          service.historyRevision.value++;
-        }
       } else if (res is Error && res.code == 1024) {
         service.logout();
         _toast('绿联云登录已过期');
