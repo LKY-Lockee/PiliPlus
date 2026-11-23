@@ -29,12 +29,13 @@ Download a build from [Releases](https://github.com/LKY-Lockee/PiliPlus/releases
 
 ## Disclaimer
 
-PiliPlus is a personal project developed for educational purposes, intended only for learning and testing. Please delete it within 24 hours of downloading.
-All APIs used were collected from the official website. This project does not provide any cracked content.
+PiliPlus is a personal project developed for educational purposes, intended only for learning and testing. Please delete it within 24 hours of downloading.<br />
+All APIs used were collected from the official website. This project does not provide any cracked content.<br />
 
-Credit to the original project: [guozhigq/pilipala](https://github.com/guozhigq/pilipala).
-Credit to the upstream project: [orz12/PiliPalaX](https://github.com/orz12/PiliPalaX).
-Credit to the upstream project: [bggRGjQaUbCoE/PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus).
+- Credit to the original project: [guozhigq/pilipala](https://github.com/guozhigq/pilipala).
+- Credit to the upstream project: [orz12/PiliPalaX](https://github.com/orz12/PiliPalaX).
+- Credit to the upstream project: [bggRGjQaUbCoE/PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus).
+
 This repository adds more extra features. Thank you to the original authors for sharing their work as open source.
 
 Thank you for using PiliPlus.

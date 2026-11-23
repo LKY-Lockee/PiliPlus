@@ -206,6 +206,7 @@
 
 - [x] 特色功能
     - [x] `TVBox`集成
+    - [x] `UGreen NAS 影视中心`集成
 
 - [ ] 等等
 
@@ -215,14 +216,16 @@
 
 ## 声明
 
-此项目（PiliPlus）是个人为了兴趣而开发，仅用于学习和测试，请于下载后24小时内删除。
-所用API皆从官方网站收集，不提供任何破解内容。
-在此致敬原作者：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
-在此致敬上游作者：[orz12/PiliPalaX](https://github.com/orz12/PiliPalaX)
-在此感谢上游作者：[bggRGjQaUbCoE/PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus)
+此项目（PiliPlus）是个人为了兴趣而开发，仅用于学习和测试，请于下载后24小时内删除。<br />
+所用API皆从官方网站收集，不提供任何破解内容。<br />
+
+- 在此致敬原作者：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
+- 在此致敬上游作者：[orz12/PiliPalaX](https://github.com/orz12/PiliPalaX)
+- 在此感谢上游作者：[bggRGjQaUbCoE/PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus)
+
 本仓库添加了额外的功能，感谢原作者的开源精神。
 
-感谢使用
+感谢使用PiliPlus。
 
 ## 致谢
 
