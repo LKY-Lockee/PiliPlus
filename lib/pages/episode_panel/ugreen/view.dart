@@ -89,21 +89,21 @@ class _EpisodeUgreenPanelState extends State<EpisodeUgreenPanel>
   }
 
   @override
-  Widget buildPage(ThemeData theme) {
+  Widget buildPage() {
     return Material(
       color: showTitle ? theme.colorScheme.surface : null,
       type: showTitle ? MaterialType.canvas : MaterialType.transparency,
       child: Column(
         children: [
           _buildToolbar(theme),
-          Expanded(child: enableSlide ? slideList(theme) : buildList(theme)),
+          Expanded(child: enableSlide ? slideList() : buildList()),
         ],
       ),
     );
   }
 
   @override
-  Widget buildList(ThemeData theme) {
+  Widget buildList() {
     return _buildBody(theme, 0, _getCurrEpisodes);
   }
 

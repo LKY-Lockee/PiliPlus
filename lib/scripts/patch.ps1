@@ -2,10 +2,14 @@ param(
     [string]$platform = ""
 )
 
-if ($env:CI -eq 'true') {
-    git config --global user.name "ci"
-    git config --global user.email "example@example.com"
-}
+$env:GIT_AUTHOR_NAME = "ci"
+$env:GIT_AUTHOR_EMAIL = "example@example.com"
+$env:GIT_COMMITTER_NAME = "ci"
+$env:GIT_COMMITTER_EMAIL = "example@example.com"
+
+# TODO: remove
+# https://github.com/flutter/flutter/issues/182281
+$NewOverScrollIndicator = "362b1de29974ffc1ed6faa826e1df870d7bec75f";
 
 # set `gestureSettings`
 $BottomSheetAndroidPatch = "lib/scripts/bottom_sheet_android.patch"

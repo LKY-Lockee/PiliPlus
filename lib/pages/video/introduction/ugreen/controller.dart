@@ -5,6 +5,7 @@ import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models_new/ugreen/detail.dart';
 import 'package:PiliPlus/models_new/ugreen/play.dart';
 import 'package:PiliPlus/models_new/ugreen/transcode.dart';
+import 'package:PiliPlus/models_new/video/video_detail/episode.dart';
 import 'package:PiliPlus/models_new/video/video_detail/stat_detail.dart';
 import 'package:PiliPlus/pages/common/common_intro_controller.dart';
 import 'package:PiliPlus/pages/episode_panel/ugreen/view.dart';
@@ -1058,6 +1059,9 @@ class UgreenIntroController extends CommonIntroController {
 
   @override
   void queryVideoIntro() {}
+
+  @override
+  void onChangeEpisode(BaseEpisodeItem episode) {}
 
   @override
   int get copyright => 1;

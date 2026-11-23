@@ -39,7 +39,7 @@ class _VodIntroDetailState extends State<VodIntroPanel>
   }
 
   @override
-  Widget buildPage(ThemeData theme) {
+  Widget buildPage() {
     return Material(
       color: theme.colorScheme.surface,
       child: Column(
@@ -74,7 +74,7 @@ class _VodIntroDetailState extends State<VodIntroPanel>
             ],
           ),
           Expanded(
-            child: enableSlide ? slideList(theme) : buildList(theme),
+            child: enableSlide ? slideList() : buildList(),
           ),
         ],
       ),
@@ -82,7 +82,7 @@ class _VodIntroDetailState extends State<VodIntroPanel>
   }
 
   @override
-  Widget buildList(ThemeData theme) {
+  Widget buildList() {
     return TabBarView(
       controller: _tabController,
       physics: tabBarScrollPhysics,

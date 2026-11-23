@@ -96,7 +96,7 @@ class _EpisodeVodPanelState extends State<EpisodeVodPanel>
   late final _isMulti = widget.list.length > 1;
 
   @override
-  Widget buildPage(ThemeData theme) {
+  Widget buildPage() {
     return Material(
       color: showTitle ? theme.colorScheme.surface : null,
       type: showTitle ? MaterialType.canvas : MaterialType.transparency,
@@ -112,14 +112,14 @@ class _EpisodeVodPanelState extends State<EpisodeVodPanel>
               dividerHeight: 1,
               dividerColor: theme.dividerColor.withValues(alpha: 0.1),
             ),
-          Expanded(child: enableSlide ? slideList(theme) : buildList(theme)),
+          Expanded(child: enableSlide ? slideList() : buildList()),
         ],
       ),
     );
   }
 
   @override
-  Widget buildList(ThemeData theme) {
+  Widget buildList() {
     if (_isMulti) {
       return TabBarView(
         controller: _tabController,

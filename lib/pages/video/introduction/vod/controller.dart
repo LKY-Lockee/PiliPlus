@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models_new/history/history_vod/list.dart';
+import 'package:PiliPlus/models_new/video/video_detail/episode.dart';
 import 'package:PiliPlus/models_new/video/video_detail/stat_detail.dart';
 import 'package:PiliPlus/models_new/vod/detail.dart';
 import 'package:PiliPlus/models_new/vod/play.dart';
@@ -42,6 +43,9 @@ class VodIntroController extends CommonIntroController {
 
   @override
   void queryVideoIntro() {}
+
+  @override
+  void onChangeEpisode(BaseEpisodeItem episode) {}
 
   @override
   int get copyright => 1;
