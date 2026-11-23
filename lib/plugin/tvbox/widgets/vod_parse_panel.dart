@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/parse_bean.dart';
-import 'package:PiliPlus/utils/extension/context_ext.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
@@ -24,7 +23,7 @@ class VodParsePanel extends StatelessWidget {
       isScrollControlled: true,
       clipBehavior: Clip.hardEdge,
       constraints: BoxConstraints(
-        maxWidth: min(640, context.mediaQueryShortestSide),
+        maxWidth: min(640, MediaQuery.shortestSideOf(context)),
       ),
       builder: (context) => VodParsePanel(
         parses: parses,

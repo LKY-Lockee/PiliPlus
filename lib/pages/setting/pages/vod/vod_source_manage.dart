@@ -10,7 +10,6 @@ import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox_service.dart';
 import 'package:PiliPlus/plugin/tvbox/widgets/vod_parse_panel.dart';
 import 'package:PiliPlus/plugin/tvbox/widgets/vod_source_panel.dart';
-import 'package:PiliPlus/utils/extension/context_ext.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -120,7 +119,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
       isScrollControlled: true,
       clipBehavior: Clip.hardEdge,
       constraints: BoxConstraints(
-        maxWidth: min(640, context.mediaQueryShortestSide),
+        maxWidth: min(640, MediaQuery.shortestSideOf(context)),
       ),
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
@@ -307,7 +306,7 @@ class _VodSourceManagePageState extends State<VodSourceManagePage> {
       isScrollControlled: true,
       clipBehavior: Clip.hardEdge,
       constraints: BoxConstraints(
-        maxWidth: min(640, context.mediaQueryShortestSide),
+        maxWidth: min(640, MediaQuery.shortestSideOf(context)),
       ),
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,

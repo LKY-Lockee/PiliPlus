@@ -143,6 +143,8 @@ pili_release.json
 dist
 
 test*
+!/test/
+!/test/**
 
 # Widget Preview related
 .widget_preview/
