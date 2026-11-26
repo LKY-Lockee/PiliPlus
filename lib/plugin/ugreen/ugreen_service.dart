@@ -38,6 +38,14 @@ class UgreenService extends GetxService {
 
   bool get isLogin => session.value?.token.isNotEmpty == true;
 
+  static bool isKnownHost(String host) {
+    if (!Get.isRegistered<UgreenService>()) {
+      return false;
+    }
+    final session = Get.find<UgreenService>().session.value;
+    return session != null && UgreenEndpoint.isKnownHost(session, host);
+  }
+
   @override
   void onInit() {
     super.onInit();

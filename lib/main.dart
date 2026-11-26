@@ -423,6 +423,9 @@ class _CustomHttpOverrides extends HttpOverrides {
     //   ..idleTimeout = const Duration(seconds: 15);
     if (kDebugMode || Pref.badCertificateCallback) {
       client.badCertificateCallback = (cert, host, port) => true;
+    } else {
+      client.badCertificateCallback = (cert, host, port) =>
+          UgreenService.isKnownHost(host);
     }
     return client;
   }

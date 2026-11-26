@@ -45,6 +45,34 @@ abstract final class UgreenEndpoint {
     return local.isEmpty ? '' : local.first;
   }
 
+  static bool isKnownHost(UgreenSession session, String host) {
+    final target = host.toLowerCase();
+    bool matches(String value) => value.toLowerCase() == target;
+
+    if (session.ipv4.any(matches) ||
+        session.ipv6.any(matches) ||
+        session.hosts.any(matches)) {
+      return true;
+    }
+
+    final relay = session.relayBaseUrl;
+    if (relay != null) {
+      final uri = Uri.tryParse(relay);
+      if (uri != null && matches(uri.host)) {
+        return true;
+      }
+    }
+
+    final base = _cachedBase;
+    if (base != null) {
+      final uri = Uri.tryParse(base);
+      if (uri != null && matches(uri.host)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static void invalidate() {
     _cachedToken = null;
     _cachedBase = null;
