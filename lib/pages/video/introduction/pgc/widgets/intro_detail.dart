@@ -145,23 +145,14 @@ class _IntroDetailState extends State<PgcIntroPanel>
           ],
         ),
         const SizedBox(height: 4),
-        Row(
-          spacing: 6,
-          children: [
+        Text(
+          [
             if (widget.item.areas?.isNotEmpty ?? false)
-              Text(
-                widget.item.areas!.first.name!,
-                style: smallTitle,
-              ),
-            Text(
-              widget.item.publish!.pubTimeShow!,
-              style: smallTitle,
-            ),
-            Text(
-              widget.item.newEp!.desc!,
-              style: smallTitle,
-            ),
-          ],
+              widget.item.areas!.first.name!,
+            widget.item.publish!.pubTimeShow!,
+            widget.item.newEp!.desc!,
+          ].join('   '),
+          style: smallTitle,
         ),
         if (widget.item.evaluate?.isNotEmpty == true) ...[
           const SizedBox(height: 20),
