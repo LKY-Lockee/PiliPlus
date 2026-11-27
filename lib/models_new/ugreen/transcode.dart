@@ -77,23 +77,27 @@ class UgreenTranscodeInfo {
       rotation: json['rotation'] as String,
       resolution: UgreenResolution.fromJson(json['resolution']),
       segment: UgreenSegmentInfo.fromJson(json['segment']),
-      audios: (json['audios'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenAudioTrack.fromJson(e.cast()))
-          .whereType<UgreenAudioTrack>()
-          .toList(),
+      audios:
+          (json['audios'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenAudioTrack.fromJson(e.cast()))
+              .whereType<UgreenAudioTrack>()
+              .toList() ??
+          const [],
       subtitles:
           (json['subtitles'] as List?)
               ?.whereType<Map>()
               .map((e) => UgreenSubtitleTrack.fromJson(e.cast()))
               .whereType<UgreenSubtitleTrack>()
               .toList() ??
-          [],
-      transcodeable: (json['transcodeable'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenTranscodableResolution.fromJson(e.cast()))
-          .whereType<UgreenTranscodableResolution>()
-          .toList(),
+          const [],
+      transcodeable:
+          (json['transcodeable'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenTranscodableResolution.fromJson(e.cast()))
+              .whereType<UgreenTranscodableResolution>()
+              .toList() ??
+          const [],
       isHwAccelSupport: json['is_hw_accel_support'] as bool,
       supportLossless: json['support_lossless'] as bool,
       isTranscode: json['is_transcode'] as bool,

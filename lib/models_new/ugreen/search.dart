@@ -22,30 +22,30 @@ enum UgreenSearchType {
 }
 
 class UgreenSearchGroup<T> extends SearchNumData<T> {
+  int cursor;
+
   UgreenSearchGroup({
     super.numResults,
     super.list,
     this.cursor = 0,
   });
 
-  int cursor;
-
   factory UgreenSearchGroup.fromJson(
-    dynamic json,
+    Map<String, dynamic> json,
     T Function(Map<String, dynamic>) itemFromJson,
   ) {
-    if (json is! Map || json.isEmpty) {
+    if (json.isEmpty) {
       return UgreenSearchGroup<T>(numResults: 0, list: const [], cursor: 0);
     }
-    final map = json.cast<String, dynamic>();
-    final rawList = map['list'];
     return UgreenSearchGroup<T>(
-      numResults: map['total_num'] as int,
-      list: (rawList as List)
-          .whereType<Map>()
-          .map((e) => itemFromJson(e.cast<String, dynamic>()))
-          .toList(),
-      cursor: map['cursor'] as int,
+      numResults: json['total_num'] as int,
+      list:
+          (json['list'] as List?)
+              ?.whereType<Map>()
+              .map((e) => itemFromJson(e.cast<String, dynamic>()))
+              .toList() ??
+          const [],
+      cursor: json['cursor'] as int,
     );
   }
 }
@@ -101,92 +101,128 @@ class UgreenSearchData {
 
 class UgreenSearchMedia {
   final int ugVideoInfoId;
+  final int doubanId;
+  final int tmdbId;
+  final int useNfo;
   final String ugMediaId;
   final String name;
   final String jpName;
+  final String pinyinFirst;
+  final String pinyinFull;
+  final String to9Digit;
+  final int releaseDate;
   final int type;
   final int year;
-  final int releaseDate;
-  final num score;
-  final int duration;
   final String posterPath;
   final String backdropPath;
   final String logoPath;
   final String tagline;
+  final String noLangPosterPath;
+  final String noLangBackdropPath;
   final String language;
   final String categoryId;
+  final String oldCategoryId;
   final int mediaLibSetId;
   final String collectionId;
-  final int localCount;
-  final int episodeCount;
+  final int collectionTime;
+  final String lastPlayFilePath;
+  final num score;
   final List<String> filePath;
   final int clarity;
+  final int duration;
+  final String videoQuality;
+  final String audioQuality;
+  final int localCount;
+  final int episodeCount;
   final bool isFavorite;
+  final List<int> styleList;
   final List<String> styleNames;
   final List<String> directors;
   final List<String> actors;
-  final int doubanId;
-  final int tmdbId;
 
   const UgreenSearchMedia({
     required this.ugVideoInfoId,
+    required this.doubanId,
+    required this.tmdbId,
+    required this.useNfo,
     required this.ugMediaId,
     required this.name,
     required this.jpName,
+    required this.pinyinFirst,
+    required this.pinyinFull,
+    required this.to9Digit,
+    required this.releaseDate,
     required this.type,
     required this.year,
-    required this.releaseDate,
-    required this.score,
-    required this.duration,
     required this.posterPath,
     required this.backdropPath,
     required this.logoPath,
     required this.tagline,
+    required this.noLangPosterPath,
+    required this.noLangBackdropPath,
     required this.language,
     required this.categoryId,
+    required this.oldCategoryId,
     required this.mediaLibSetId,
     required this.collectionId,
-    required this.localCount,
-    required this.episodeCount,
+    required this.collectionTime,
+    required this.lastPlayFilePath,
+    required this.score,
     required this.filePath,
     required this.clarity,
+    required this.duration,
+    required this.videoQuality,
+    required this.audioQuality,
+    required this.localCount,
+    required this.episodeCount,
     required this.isFavorite,
+    required this.styleList,
     required this.styleNames,
     required this.directors,
     required this.actors,
-    required this.doubanId,
-    required this.tmdbId,
   });
 
   static UgreenSearchMedia fromJson(Map<String, dynamic> json) {
     return UgreenSearchMedia(
       ugVideoInfoId: json['ug_video_info_id'] as int,
+      doubanId: json['douban_id'] as int,
+      tmdbId: json['tmdb_id'] as int,
+      useNfo: json['use_nfo'] as int,
       ugMediaId: json['ug_media_id'] as String,
       name: json['name'] as String,
       jpName: json['jp_name'] as String,
+      pinyinFirst: json['pinyin_first'] as String,
+      pinyinFull: json['pinyin_full'] as String,
+      to9Digit: json['to9_digit'] as String,
+      releaseDate: json['release_date'] as int,
       type: json['type'] as int,
       year: json['year'] as int,
-      releaseDate: json['release_date'] as int,
-      score: json['score'] as num,
-      duration: json['duration'] as int,
       posterPath: json['poster_path'] as String,
       backdropPath: json['backdrop_path'] as String,
       logoPath: json['logo_path'] as String,
       tagline: json['tagline'] as String,
+      noLangPosterPath: json['no_lang_poster_path'] as String,
+      noLangBackdropPath: json['no_lang_backdrop_path'] as String,
       language: json['language'] as String,
       categoryId: json['category_id'] as String,
+      oldCategoryId: json['old_category_id'] as String,
       mediaLibSetId: json['media_lib_set_id'] as int,
       collectionId: json['collection_id'] as String,
+      collectionTime: json['collection_time'] as int,
+      lastPlayFilePath: json['last_play_file_path'] as String,
+      score: json['score'] as num,
+      filePath: (json['file_path'] as List?)?.cast() ?? const [],
+      clarity: json['clarity'] as int,
+      duration: json['duration'] as int,
+      videoQuality: json['video_quality'] as String,
+      audioQuality: json['audio_quality'] as String,
       localCount: json['local_count'] as int,
       episodeCount: json['episode_count'] as int,
-      filePath: (json['file_path'] as List).cast(),
-      clarity: json['clarity'] as int,
       isFavorite: json['is_favorite'] as bool,
-      styleNames: (json['style_names'] as List?)?.cast() ?? [],
-      directors: (json['directors'] as List?)?.cast() ?? [],
-      actors: (json['actors'] as List?)?.cast() ?? [],
-      doubanId: json['douban_id'] as int,
-      tmdbId: json['tmdb_id'] as int,
+      styleList: (json['style_list'] as List?)?.cast() ?? const [],
+      styleNames: (json['style_names'] as List?)?.cast() ?? const [],
+      directors: (json['directors'] as List?)?.cast() ?? const [],
+      actors: (json['actors'] as List?)?.cast() ?? const [],
     );
   }
 }
@@ -240,25 +276,25 @@ class UgreenSearchCollection {
 
 class UgreenSearchPeople {
   final String actorOnceId;
-  final String name;
-  final String alias;
   final String avatarUrl;
+  final String alias;
+  final String name;
   final int creditsCount;
 
   const UgreenSearchPeople({
     required this.actorOnceId,
-    required this.name,
-    required this.alias,
     required this.avatarUrl,
+    required this.alias,
+    required this.name,
     required this.creditsCount,
   });
 
   static UgreenSearchPeople fromJson(Map<String, dynamic> json) {
     return UgreenSearchPeople(
       actorOnceId: json['actor_once_id'] as String,
-      name: json['name'] as String,
-      alias: json['alias'] as String,
       avatarUrl: json['avatar_url'] as String,
+      alias: json['alias'] as String,
+      name: json['name'] as String,
       creditsCount: json['credits_count'] as int,
     );
   }
@@ -316,25 +352,25 @@ sealed class UgreenSearchEntry {
 }
 
 class UgreenSearchMediaEntry extends UgreenSearchEntry {
-  const UgreenSearchMediaEntry(this.item);
-
   final UgreenSearchMedia item;
+
+  const UgreenSearchMediaEntry(this.item);
 }
 
 class UgreenSearchCollectionEntry extends UgreenSearchEntry {
-  const UgreenSearchCollectionEntry(this.item);
-
   final UgreenSearchCollection item;
+
+  const UgreenSearchCollectionEntry(this.item);
 }
 
 class UgreenSearchPeopleEntry extends UgreenSearchEntry {
-  const UgreenSearchPeopleEntry(this.item);
-
   final UgreenSearchPeople item;
+
+  const UgreenSearchPeopleEntry(this.item);
 }
 
 class UgreenSearchFileEntry extends UgreenSearchEntry {
-  const UgreenSearchFileEntry(this.item);
-
   final UgreenSearchFile item;
+
+  const UgreenSearchFileEntry(this.item);
 }

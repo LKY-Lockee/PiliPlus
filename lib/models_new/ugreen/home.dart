@@ -42,10 +42,12 @@ class UgreenHomeSection<T> {
   ) {
     return UgreenHomeSection<T>(
       totalNum: json['total_num'] as int,
-      videoArr: (json['video_arr'] as List)
-          .whereType<Map>()
-          .map((e) => itemFromJson(e.cast<String, dynamic>()))
-          .toList(),
+      videoArr:
+          (json['video_arr'] as List?)
+              ?.whereType<Map>()
+              .map((e) => itemFromJson(e.cast<String, dynamic>()))
+              .toList() ??
+          const [],
     );
   }
 }
@@ -124,10 +126,10 @@ class UgreenHomeVideo {
       year: json['year'] as int,
       localCount: json['local_count'] as int,
       episodeCount: json['episode_count'] as int,
-      countryList: (json['country_list'] as List).cast(),
-      styleList: (json['style_list'] as List).cast(),
+      countryList: (json['country_list'] as List?)?.cast() ?? const [],
+      styleList: (json['style_list'] as List?)?.cast() ?? const [],
       grading: json['grading'] as int,
-      filePath: (json['file_path'] as List).cast(),
+      filePath: (json['file_path'] as List?)?.cast() ?? const [],
       introduction: json['introduction'] as String,
       type: json['type'] as int,
       posterPath: json['poster_path'] as String,
@@ -243,10 +245,10 @@ class UgreenHomeHistory {
       year: json['year'] as int,
       localCount: json['local_count'] as int,
       episodeCount: json['episode_count'] as int,
-      countryList: (json['country_list'] as List).cast(),
-      styleList: (json['style_list'] as List).cast(),
+      countryList: (json['country_list'] as List?)?.cast() ?? const [],
+      styleList: (json['style_list'] as List?)?.cast() ?? const [],
       grading: json['grading'] as int,
-      filePath: (json['file_path'] as List).cast(),
+      filePath: (json['file_path'] as List?)?.cast() ?? const [],
       introduction: json['introduction'] as String,
       type: json['type'] as int,
       posterPath: json['poster_path'] as String,

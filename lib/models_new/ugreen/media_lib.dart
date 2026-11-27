@@ -7,11 +7,13 @@ class UgreenMediaLibData {
 
   static UgreenMediaLibData fromJson(Map<String, dynamic> json) {
     return UgreenMediaLibData(
-      mediaLibInfoList: (json['media_lib_info_list'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenMediaLibInfo.fromJson(e.cast()))
-          .whereType<UgreenMediaLibInfo>()
-          .toList(),
+      mediaLibInfoList:
+          (json['media_lib_info_list'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenMediaLibInfo.fromJson(e.cast()))
+              .whereType<UgreenMediaLibInfo>()
+              .toList() ??
+          const [],
     );
   }
 }
@@ -39,8 +41,8 @@ class UgreenMediaLibInfo {
     return UgreenMediaLibInfo(
       mediaLibSetId: json['media_lib_set_id'] as int,
       mediaName: json['media_name'] as String,
-      posterPaths: (json['poster_paths'] as List).cast(),
-      backdropPaths: (json['backdrop_paths'] as List).cast(),
+      posterPaths: (json['poster_paths'] as List?)?.cast() ?? const [],
+      backdropPaths: (json['backdrop_paths'] as List?)?.cast() ?? const [],
       videoCount: json['video_count'] as int,
       orderSn: json['order_sn'] as int,
       customCover: json['custom_cover'] as String,

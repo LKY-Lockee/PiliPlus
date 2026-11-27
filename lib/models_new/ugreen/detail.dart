@@ -102,11 +102,11 @@ class UgreenVideoSummary {
       score: json['score'] as num,
       year: json['year'] as int,
       season: json['season'] as int,
-      countryList: (json['country_list'] as List).cast(),
-      styleList: (json['style_list'] as List).cast(),
+      countryList: (json['country_list'] as List?)?.cast() ?? const [],
+      styleList: (json['style_list'] as List?)?.cast() ?? const [],
       grading: json['grading'] as int,
       duration: json['duration'] as int,
-      filePath: (json['file_path'] as List).cast(),
+      filePath: (json['file_path'] as List?)?.cast() ?? const [],
       introduction: json['introduction'] as String,
       type: json['type'] as int,
       posterPath: json['poster_path'] as String,
@@ -320,7 +320,7 @@ class UgreenMovieDetail {
               .map((e) => UgreenActorDetail.fromJson((e).cast()))
               .whereType<UgreenActorDetail>()
               .toList() ??
-          [],
+          const [],
       isFavorite: json['is_favorite'] as bool,
       playStatus: UgreenPlayStatus.fromJson(json['play_status']),
       metadataLockStatus: json['metadata_lock_status'] as int,
@@ -354,26 +354,32 @@ class UgreenTvDetail {
   static UgreenTvDetail fromJson(Map<String, dynamic> json) {
     return UgreenTvDetail(
       videoInfo: UgreenVideoSummary.fromJson(json['video_info']),
-      ugActorArr: (json['ug_actor_arr'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenActorDetail.fromJson((e).cast()))
-          .whereType<UgreenActorDetail>()
-          .toList(),
+      ugActorArr:
+          (json['ug_actor_arr'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenActorDetail.fromJson((e).cast()))
+              .whereType<UgreenActorDetail>()
+              .toList() ??
+          const [],
       isFavorite: json['is_favorite'] as bool,
       playStatus: UgreenPlayStatus.fromJson(json['play_status']),
-      tvInfo: (json['tv_info'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenTvEpisode.fromJson((e).cast()))
-          .whereType<UgreenTvEpisode>()
-          .toList(),
-      folderPaths: (json['folder_paths'] as List).cast(),
+      tvInfo:
+          (json['tv_info'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenTvEpisode.fromJson((e).cast()))
+              .whereType<UgreenTvEpisode>()
+              .toList() ??
+          const [],
+      folderPaths: (json['folder_paths'] as List?)?.cast() ?? const [],
       selectFolder: json['select_folder'] as String,
       metadataLockStatus: json['metadata_lock_status'] as int,
-      seasonInfo: (json['season_info'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenSeasonInfo.fromJson((e).cast()))
-          .whereType<UgreenSeasonInfo>()
-          .toList(),
+      seasonInfo:
+          (json['season_info'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenSeasonInfo.fromJson((e).cast()))
+              .whereType<UgreenSeasonInfo>()
+              .toList() ??
+          const [],
     );
   }
 }
@@ -410,11 +416,13 @@ class UgreenTvEpisode {
       episode: json['episode'] as int,
       episodeFlag: json['episode_flag'] as String,
       recentlyPlayedFilePath: json['recently_played_file_path'] as String,
-      fileInfo: (json['file_info'] as List)
-          .whereType<Map>()
-          .map((e) => UgreenTvEpisodeFile.fromJson(e.cast()))
-          .whereType<UgreenTvEpisodeFile>()
-          .toList(),
+      fileInfo:
+          (json['file_info'] as List?)
+              ?.whereType<Map>()
+              .map((e) => UgreenTvEpisodeFile.fromJson(e.cast()))
+              .whereType<UgreenTvEpisodeFile>()
+              .toList() ??
+          const [],
       overview: json['overview'] as String,
     );
   }
