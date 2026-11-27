@@ -134,6 +134,25 @@ class _VodIntroPageState extends State<VodIntroPage> {
   }
 
   Widget _buildInfoPanel(bool isPortrait, VodVideo item) {
+    Widget subBtn() => Obx(() {
+      final isFav = introController.isFav.value;
+      return FilledButton.tonal(
+        style: FilledButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+          visualDensity: VisualDensity.compact,
+          foregroundColor: isFav ? colorScheme.outline : null,
+          backgroundColor: isFav ? colorScheme.onInverseSurface : null,
+        ),
+        onPressed: introController.toggleFav,
+        child: Text(
+          isFav ? '已收藏' : '收藏',
+        ),
+      );
+    });
     Widget title() => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
@@ -146,6 +165,7 @@ class _VodIntroPageState extends State<VodIntroPage> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        subBtn(),
       ],
     );
     List<Widget> desc() => [
@@ -214,16 +234,6 @@ class _VodIntroPageState extends State<VodIntroPage> {
             selectStatus: false,
             semanticsLabel: '更换解析',
             text: '更换解析',
-          ),
-          Obx(
-            () => ActionItem(
-              icon: const Icon(FontAwesomeIcons.star),
-              selectIcon: const Icon(FontAwesomeIcons.solidStar),
-              onTap: introController.toggleFav,
-              selectStatus: introController.isFav.value,
-              semanticsLabel: '收藏',
-              text: introController.isFav.value ? '已收藏' : '收藏',
-            ),
           ),
           ActionItem(
             icon: const Icon(FontAwesomeIcons.copy),
