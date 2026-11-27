@@ -2,12 +2,13 @@ import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/button/more_btn.dart';
 import 'package:PiliPlus/common/widgets/flutter/refresh_indicator.dart';
 import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
-import 'package:PiliPlus/common/widgets/loading_widget/loading_widget.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models/common/fav_type.dart';
 import 'package:PiliPlus/models/common/search/search_type.dart';
 import 'package:PiliPlus/models_new/fav/fav_vod/list.dart';
+import 'package:PiliPlus/models_new/history/history_vod/list.dart';
 import 'package:PiliPlus/models_new/vod/video_data.dart';
+import 'package:PiliPlus/pages/history/vod/view.dart';
 import 'package:PiliPlus/pages/vod/controller.dart';
 import 'package:PiliPlus/pages/vod/widgets/vod_card_v.dart';
 import 'package:PiliPlus/pages/vod_index/view.dart';
@@ -45,7 +46,7 @@ class _VodPageState extends State<VodPage> with AutomaticKeepAliveClientMixin {
         controller: controller.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          _buildFollow(theme),
+          ..._buildSections(theme),
           ..._buildRcmd(theme),
         ],
       ),
@@ -156,96 +157,129 @@ class _VodPageState extends State<VodPage> with AutomaticKeepAliveClientMixin {
     };
   }
 
-  Widget _buildFollow(ThemeData theme) => SliverToBoxAdapter(
-    child: Column(
-      children: [
-        _buildFollowTitle(theme),
-        SizedBox(
-          height:
-              Grid.smallCardWidth / 2 / 0.75 +
-              MediaQuery.textScalerOf(context).scale(50),
-          child: Obx(
-            () => _buildFollowBody(controller.followState.value),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildFollowTitle(ThemeData theme) => Padding(
-    padding: const EdgeInsets.only(left: 16),
-    child: Row(
-      children: [
-        Obx(
-          () => Text(
-            '最近点播 ${controller.followCount.value <= 0 ? '' : ' ${controller.followCount.value}'}',
-            style: theme.textTheme.titleMedium,
-          ),
-        ),
-        const Spacer(),
-        IconButton(
-          tooltip: '刷新',
-          onPressed: controller.queryVodFollow,
-          icon: const Icon(
-            Icons.refresh,
-            size: 20,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: moreTextButton(
-            text: '查看全部',
-            onTap: () => Get.toNamed(
-              '/fav',
-              arguments: FavTabType.vod.index,
+  List<Widget> _buildSections(ThemeData theme) {
+    final sections = <Widget>[];
+    void addRail<T>({
+      required String title,
+      required List<T> list,
+      required String emptyText,
+      required VoidCallback onRefresh,
+      required VoidCallback onMore,
+      required Widget Function(T item) cardBuilder,
+    }) {
+      sections
+        ..add(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Row(
+                children: [
+                  Text(
+                    title + (list.isEmpty ? '' : ' ${list.length}'),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: '刷新',
+                    onPressed: onRefresh,
+                    icon: const Icon(
+                      Icons.refresh,
+                      size: 20,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: moreTextButton(
+                      text: '查看全部',
+                      onTap: onMore,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      color: theme.colorScheme.secondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            color: theme.colorScheme.secondary,
           ),
-        ),
-      ],
-    ),
-  );
+        )
+        ..add(
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height:
+                  Grid.smallCardWidth / 2 / 0.75 +
+                  MediaQuery.textScalerOf(context).scale(50),
+              child: list.isEmpty
+                  ? Center(child: Text(emptyText))
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: list.length,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: Grid.smallCardWidth / 2,
+                          margin: EdgeInsets.only(
+                            left: Style.safeSpace,
+                            right: index == list.length - 1
+                                ? Style.safeSpace
+                                : 0,
+                          ),
+                          child: cardBuilder(list[index]),
+                        );
+                      },
+                    ),
+            ),
+          ),
+        );
+    }
 
-  Widget _buildFollowBody(LoadingState<List<FavVodItemModel>?> loadingState) {
-    return switch (loadingState) {
-      Loading() => m3eLoading,
-      Success(:final response) =>
-        response != null && response.isNotEmpty
-            ? ListView.builder(
-                controller: controller.followController,
-                scrollDirection: Axis.horizontal,
-                itemCount: response.length,
-                padding: EdgeInsets.zero,
-                itemBuilder: (context, index) {
-                  var resp = response[index];
-                  return Container(
-                    width: Grid.smallCardWidth / 2,
-                    margin: EdgeInsets.only(
-                      left: Style.safeSpace,
-                      right: index == response.length - 1 ? Style.safeSpace : 0,
-                    ),
-                    child: VodCardV(
-                      item: VodVideo(
-                        id: resp.vodId,
-                        title: resp.title ?? '',
-                        cover: resp.cover,
-                        remarks: resp.remarks,
-                        type: "看到${resp.showTitle}",
-                      )..sourceKey = resp.sourceKey,
-                    ),
-                  );
-                },
-              )
-            : const Center(child: Text('还没有点播')),
-      Error(:final errMsg) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        alignment: Alignment.center,
-        child: Text(
-          errMsg ?? '',
-          textAlign: TextAlign.center,
-        ),
+    addRail<HistoryVodItemModel>(
+      title: '最近播放',
+      list: controller.historyList,
+      emptyText: '还没有播放记录',
+      onRefresh: controller.refreshHistory,
+      onMore: () => Get.toNamed('/history', arguments: HistoryVodPage),
+      cardBuilder: (item) => _buildVodCard(
+        sourceKey: item.sourceKey,
+        vodId: item.vodId,
+        title: item.title,
+        cover: item.cover,
+        remarks: item.remarks,
+        showTitle: item.showTitle,
       ),
-    };
+    );
+    addRail<FavVodItemModel>(
+      title: '我的收藏',
+      list: controller.favoriteList,
+      emptyText: '还没有收藏',
+      onRefresh: controller.refreshFavorites,
+      onMore: () => Get.toNamed('/fav', arguments: FavTabType.vod.index),
+      cardBuilder: (item) => _buildVodCard(
+        sourceKey: item.sourceKey,
+        vodId: item.vodId,
+        title: item.title,
+        cover: item.cover,
+        remarks: item.remarks,
+        showTitle: item.showTitle,
+      ),
+    );
+    return sections;
+  }
+
+  Widget _buildVodCard({
+    required String sourceKey,
+    required String vodId,
+    required String? title,
+    required String? cover,
+    required String? remarks,
+    required String? showTitle,
+  }) {
+    return VodCardV(
+      item: VodVideo(
+        id: vodId,
+        title: title ?? '',
+        cover: cover,
+        remarks: remarks,
+        type: showTitle == null || showTitle.isEmpty ? null : '看到$showTitle',
+      )..sourceKey = sourceKey,
+    );
   }
 }

@@ -2,16 +2,17 @@ import 'dart:convert';
 
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models_new/fav/fav_vod/list.dart';
+import 'package:PiliPlus/models_new/history/history_vod/list.dart';
 import 'package:PiliPlus/models_new/vod/video_data.dart';
 import 'package:PiliPlus/pages/common/common_list_controller.dart';
 import 'package:PiliPlus/plugin/tvbox/catvod/net/http.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/cache/vod_collect.dart';
+import 'package:PiliPlus/plugin/tvbox/tvbox/osc/cache/vod_record.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/viewmodel/source_view_model.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox_service.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart' show ScrollController;
 import 'package:get/get.dart';
 
 class VodController extends CommonListController<List<VodVideo>?, VodVideo> {
@@ -41,7 +42,7 @@ class VodController extends CommonListController<List<VodVideo>?, VodVideo> {
       _loadRec();
     });
 
-    queryVodFollow();
+    queryVodLocal();
     tvboxService.getConfig().then((_) {
       if (!isClosed) {
         _setupVodSources();
@@ -51,7 +52,7 @@ class VodController extends CommonListController<List<VodVideo>?, VodVideo> {
 
   @override
   Future<void> onRefresh() {
-    queryVodFollow();
+    queryVodLocal();
     return super.onRefresh();
   }
 
@@ -91,11 +92,11 @@ class VodController extends CommonListController<List<VodVideo>?, VodVideo> {
     queryData();
   }
 
-  // follow
-  late RxInt followCount = (-1).obs;
-  late Rx<LoadingState<List<FavVodItemModel>?>> followState =
-      LoadingState<List<FavVodItemModel>?>.loading().obs;
-  final followController = ScrollController();
+  // 最近播放
+  final historyList = <HistoryVodItemModel>[].obs;
+
+  // 我的收藏
+  final favoriteList = <FavVodItemModel>[].obs;
 
   // douban
   static const int _doubanPageSize = 20;
@@ -182,11 +183,18 @@ class VodController extends CommonListController<List<VodVideo>?, VodVideo> {
     }
   }
 
-  // 我的订阅
-  void queryVodFollow() {
-    final list = VodCollect.getAll();
-    followCount.value = list.length;
-    followState.value = Success(list);
+  // 最近播放 / 我的收藏
+  void refreshHistory() {
+    historyList.value = VodRecord.getAll();
+  }
+
+  void refreshFavorites() {
+    favoriteList.value = VodCollect.getAll();
+  }
+
+  void queryVodLocal() {
+    refreshHistory();
+    refreshFavorites();
   }
 
   @override
@@ -268,7 +276,6 @@ class VodController extends CommonListController<List<VodVideo>?, VodVideo> {
   void onClose() {
     _sourceWorker?.dispose();
     _recWorker?.dispose();
-    followController.dispose();
     super.onClose();
   }
 }
