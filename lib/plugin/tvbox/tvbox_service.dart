@@ -3,7 +3,6 @@ import 'package:PiliPlus/plugin/tvbox/catvod/crawler/py_loader.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/api/api_config.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/bean/source_bean.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/http_helper.dart';
-import 'package:PiliPlus/plugin/tvbox/tvbox/osc/util/search_helper.dart';
 import 'package:PiliPlus/plugin/tvbox/tvbox/osc/viewmodel/source_view_model.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
@@ -42,11 +41,8 @@ class TVBoxService extends GetxService {
 
   List<SourceBean> get sources => sourcesState.value.dataOrNull ?? const [];
 
-  List<SourceBean> get searchableSources {
-    final cfg = config;
-    if (cfg == null) return const [];
-    return SearchHelper.getSourcesForSearch(cfg);
-  }
+  List<SourceBean> get searchableSources =>
+      sources.where((source) => source.searchable).toList();
 
   static TVBoxService get to => Get.find();
 
