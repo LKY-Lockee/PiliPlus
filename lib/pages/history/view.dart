@@ -160,6 +160,8 @@ class _HistoryPageState extends State<HistoryPage>
                 ?_buildPauseTip,
                 TabBar(
                   controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
                   onTap: (index) {
                     if (!_tabController.indexIsChanging) {
                       switch (currCtr(index)) {
