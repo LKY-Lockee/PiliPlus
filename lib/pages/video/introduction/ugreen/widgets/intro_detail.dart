@@ -9,10 +9,12 @@ import 'package:material_ui/material_ui.dart';
 
 class UgreenIntroPanel extends CommonSlidePage {
   final UgreenVideoSummary item;
+  final List<UgreenActorDetail> actors;
 
   const UgreenIntroPanel({
     super.key,
     required this.item,
+    required this.actors,
   });
 
   @override
@@ -139,6 +141,18 @@ class _UgreenIntroDetailState extends State<UgreenIntroPanel>
           const SizedBox(height: 4),
           SelectionText(
             widget.item.introduction,
+            style: textStyle,
+          ),
+        ],
+        if (widget.actors.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          Text(
+            '演职人员：',
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            widget.actors.map((e) => e.name).join('  '),
             style: textStyle,
           ),
         ],

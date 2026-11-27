@@ -28,6 +28,7 @@ class UgreenIntroController extends CommonIntroController {
   final Rxn<UgreenVideoSummary> video = Rxn<UgreenVideoSummary>();
   final RxList<UgreenPlayEpisode> episodes = <UgreenPlayEpisode>[].obs;
   final RxList<UgreenSeasonInfo> seasons = <UgreenSeasonInfo>[].obs;
+  final RxList<UgreenActorDetail> actors = <UgreenActorDetail>[].obs;
   final RxInt episodeIndex = (-1).obs;
   final RxInt fileIndex = (-1).obs;
   final RxList<UgreenTranscodableResolution> qualities =
@@ -249,6 +250,7 @@ class UgreenIntroController extends CommonIntroController {
     seasons.clear();
     isFavorite.value = detail.isFavorite;
     video.value = detail.videoInfo;
+    actors.assignAll(detail.ugActorArr);
     final episode = UgreenPlayEpisode.fromMovie(detail, 0);
     if (episode.files.isEmpty) {
       detailError.value = '没有可用播放文件';
@@ -268,6 +270,7 @@ class UgreenIntroController extends CommonIntroController {
     );
     isFavorite.value = detail.isFavorite;
     video.value = detail.videoInfo;
+    actors.assignAll(detail.ugActorArr);
     episodes.assignAll([
       for (var i = 0; i < detail.tvInfo.length; i++)
         UgreenPlayEpisode.fromTvEpisode(detail.tvInfo[i], i),
@@ -1003,7 +1006,7 @@ class UgreenIntroController extends CommonIntroController {
     }
     videoDetailCtr.childKey.currentState?.showBottomSheet(
       constraints: const BoxConstraints(),
-      (context) => UgreenIntroPanel(item: data),
+      (context) => UgreenIntroPanel(item: data, actors: actors),
     );
   }
 
