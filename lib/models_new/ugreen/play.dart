@@ -36,7 +36,7 @@ class UgreenPlayEpisode {
     return UgreenPlayEpisode(
       index: index,
       episode: item.episode,
-      title: item.epName.isEmpty ? '第 ${item.episode} 集' : item.epName,
+      title: item.epName.isEmpty ? '第${item.episode}集' : item.epName,
       overview: item.overview,
       ugTelevisionEpisodeId: item.ugTelevisionEpisodeId,
       categoryId: item.categoryId,

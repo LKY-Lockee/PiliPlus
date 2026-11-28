@@ -292,7 +292,7 @@ class _EpisodeUgreenPanelState extends State<EpisodeUgreenPanel>
                       children: [
                         Expanded(
                           child: Text(
-                            title,
+                            '第$index集 $title',
                             textAlign: .start,
                             style: TextStyle(
                               height: 1.42,
