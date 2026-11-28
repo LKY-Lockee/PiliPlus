@@ -298,13 +298,6 @@ List<SettingsModel> get playSettings => [
     onTap: (_, _) => Get.to(const FullScreenSc()),
   ),
   const SwitchModel(
-    title: '竖屏扩大展示',
-    subtitle: '小屏竖屏视频宽高比由16:9扩大至1:1（不支持收起）；横屏适配时，扩大至9:16',
-    leading: Icon(Icons.expand_outlined),
-    setKey: SettingBoxKey.enableVerticalExpand,
-    defaultVal: false,
-  ),
-  const SwitchModel(
     title: '自动全屏',
     subtitle: '视频开始播放时进入全屏',
     leading: Icon(Icons.fullscreen_outlined),

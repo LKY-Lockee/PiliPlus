@@ -33,8 +33,7 @@ abstract final class SettingBoxKey {
       playerVolume = 'playerVolume',
       maxVolume = 'maxVolume';
 
-  static const String enableVerticalExpand = 'enableVerticalExpand',
-      feedBackEnable = 'feedBackEnable',
+  static const String feedBackEnable = 'feedBackEnable',
       enableLongShowControl = 'enableLongShowControl',
       horizontalScreen = 'horizontalScreen',
       CDNService = 'CDNService',
