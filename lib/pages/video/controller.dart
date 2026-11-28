@@ -111,6 +111,9 @@ class VideoDetailController extends GetxController
   late bool isFileSource;
   late bool isVod;
   late bool isUgreen;
+
+  bool get isBiliSource => !isFileSource && !isVod && !isUgreen;
+
   late bool _mediaDesc = false;
   late final RxList<MediaListItemModel> mediaList = <MediaListItemModel>[].obs;
   late String watchLaterTitle;
@@ -817,7 +820,7 @@ class VideoDetailController extends GetxController
       initSkip();
     }
 
-    if (!isFileSource) {
+    if (isBiliSource) {
       if (vttSubtitlesIndex.value == -1) {
         _queryPlayInfo();
       }
@@ -1257,6 +1260,7 @@ class VideoDetailController extends GetxController
   late bool continuePlayingPart = Pref.continuePlayingPart;
 
   Future<void> _queryPlayInfo() async {
+    if (!isBiliSource) return;
     vttSubtitles.clear();
     vttSubtitlesIndex.value = 0;
     if (plPlayerController.showViewPoints) {
@@ -1431,7 +1435,7 @@ class VideoDetailController extends GetxController
     // volume
     volume = null;
 
-    if (!isFileSource) {
+    if (isBiliSource) {
       // language
       languages.value = null;
       currLang.value = null;
@@ -1455,6 +1459,7 @@ class VideoDetailController extends GetxController
   late final RxBool showDmTrendChart = true.obs;
 
   Future<void> _getDmTrend() async {
+    if (!isBiliSource) return;
     dmTrend.value = LoadingState<List<double>>.loading();
     try {
       final res = await Request().get(
