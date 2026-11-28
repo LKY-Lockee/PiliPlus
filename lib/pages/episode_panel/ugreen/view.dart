@@ -223,8 +223,7 @@ class _EpisodeUgreenPanelState extends State<EpisodeUgreenPanel>
 
     title = episode.displayTitle;
     cover = _introController.episodeCoverUrl(episode);
-    final millis = episode.duration;
-    duration = millis == null ? null : millis ~/ 1000;
+    duration = episode.duration;
     overview = episode.overview;
 
     late final Color primary = colorScheme.primary;

@@ -167,7 +167,7 @@ class UgreenIntroController extends CommonIntroController {
     }
     final file = currentFile;
     if (file != null && file.duration > 0) {
-      return Duration(milliseconds: file.duration);
+      return Duration(seconds: file.duration);
     }
     return Duration(
       seconds: videoDetailCtr.plPlayerController.duration.value,

@@ -50,6 +50,7 @@ class UgreenPlayEpisode {
 
   factory UgreenPlayEpisode.fromMovie(UgreenMovieDetail detail, int index) {
     final info = detail.videoInfo;
+    final playStatus = detail.playStatus;
     return UgreenPlayEpisode(
       index: index,
       episode: 0,
@@ -65,9 +66,9 @@ class UgreenPlayEpisode {
               showPath: path,
               duration: info.duration,
               clarity: info.clarity,
-              progress: 0,
-              currentPlayTime: 0,
-              watchStatus: 0,
+              progress: playStatus.progress,
+              currentPlayTime: playStatus.currentPlayTime,
+              watchStatus: playStatus.watchStatus,
             ),
           )
           .toList(),
