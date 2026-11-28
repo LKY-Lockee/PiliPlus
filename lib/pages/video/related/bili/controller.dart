@@ -4,9 +4,9 @@ import 'package:PiliPlus/models/model_hot_video_item.dart';
 import 'package:PiliPlus/pages/common/common_list_controller.dart';
 import 'package:get/get.dart';
 
-class RelatedController
+class RelatedBiliController
     extends CommonListController<List<HotVideoItemModel>?, HotVideoItemModel> {
-  RelatedController({this.autoQuery = true});
+  RelatedBiliController({this.autoQuery = true});
   String bvid = Get.arguments['bvid'];
   final bool autoQuery;
 

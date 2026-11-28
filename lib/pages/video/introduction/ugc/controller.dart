@@ -24,7 +24,7 @@ import 'package:PiliPlus/models_new/video/video_detail/staff.dart';
 import 'package:PiliPlus/models_new/video/video_detail/stat_detail.dart';
 import 'package:PiliPlus/pages/common/common_intro_controller.dart';
 import 'package:PiliPlus/pages/dynamics_repost/view.dart';
-import 'package:PiliPlus/pages/video/related/controller.dart';
+import 'package:PiliPlus/pages/video/related/bili/controller.dart';
 import 'package:PiliPlus/pages/video/reply/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/services/service_locator.dart';
@@ -572,7 +572,7 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
         // 重新请求相关视频
         if (videoDetailCtr.plPlayerController.showRelatedVideo) {
           try {
-            Get.find<RelatedController>(tag: heroTag)
+            Get.find<RelatedBiliController>(tag: heroTag)
               ..bvid = bvid
               ..queryData();
           } catch (_) {}
@@ -749,12 +749,14 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
   }
 
   bool playRelated() {
-    RelatedController relatedCtr;
-    if (Get.isRegistered<RelatedController>(tag: heroTag)) {
-      relatedCtr = Get.find<RelatedController>(tag: heroTag);
+    RelatedBiliController relatedCtr;
+    if (Get.isRegistered<RelatedBiliController>(tag: heroTag)) {
+      relatedCtr = Get.find<RelatedBiliController>(tag: heroTag);
     } else {
-      relatedCtr = Get.put(RelatedController(autoQuery: false), tag: heroTag)
-        ..queryData().whenComplete(playRelated);
+      relatedCtr = Get.put(
+        RelatedBiliController(autoQuery: false),
+        tag: heroTag,
+      )..queryData().whenComplete(playRelated);
       return false;
     }
 

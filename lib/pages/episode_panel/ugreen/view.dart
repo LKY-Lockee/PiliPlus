@@ -221,7 +221,7 @@ class _EpisodeUgreenPanelState extends State<EpisodeUgreenPanel>
     String? overview;
     const cacheWidth = false;
 
-    title = episode.displayTitle;
+    title = episode.title;
     cover = _introController.episodeCoverUrl(episode);
     duration = episode.duration;
     overview = episode.overview;
@@ -307,7 +307,7 @@ class _EpisodeUgreenPanelState extends State<EpisodeUgreenPanel>
                         if (overview?.isNotEmpty ?? false)
                           Text(
                             overview!,
-                            maxLines: 2,
+                            maxLines: 4,
                             overflow: .ellipsis,
                             style: TextStyle(
                               fontSize: 12,

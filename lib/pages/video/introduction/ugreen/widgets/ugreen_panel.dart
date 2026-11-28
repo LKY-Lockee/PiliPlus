@@ -73,7 +73,7 @@ class _UgreenPanelState extends State<UgreenPanel> {
               const Text('剧集 '),
               Expanded(
                 child: Text(
-                  ' 正在播放：${currEpisode?.displayTitle ?? '未播放'}',
+                  ' 正在播放：${currEpisode?.title ?? '未播放'}',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 12, color: theme.outline),
                 ),
@@ -171,7 +171,7 @@ class _UgreenPanelState extends State<UgreenPanel> {
                   ],
                 ),
                 MarqueeText(
-                  item.displayTitle,
+                  item.title,
                   spacing: 16,
                   style: TextStyle(
                     fontSize: 13,

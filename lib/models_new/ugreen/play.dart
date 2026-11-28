@@ -1,5 +1,4 @@
 import 'package:PiliPlus/models_new/ugreen/detail.dart';
-import 'package:collection/collection.dart';
 
 class UgreenPlayEpisode {
   final int index;
@@ -22,11 +21,22 @@ class UgreenPlayEpisode {
     required this.files,
   });
 
+  int? get duration {
+    int? result;
+    for (final file in files) {
+      final value = file.duration;
+      if (value > 0 && (result == null || value > result)) {
+        result = value;
+      }
+    }
+    return result;
+  }
+
   factory UgreenPlayEpisode.fromTvEpisode(UgreenTvEpisode item, int index) {
     return UgreenPlayEpisode(
       index: index,
       episode: item.episode,
-      title: item.epName.isEmpty ? '第${item.episode}集' : item.epName,
+      title: item.epName.isEmpty ? '第 ${item.episode} 集' : item.epName,
       overview: item.overview,
       ugTelevisionEpisodeId: item.ugTelevisionEpisodeId,
       categoryId: item.categoryId,
@@ -74,21 +84,6 @@ class UgreenPlayEpisode {
           .toList(),
     );
   }
-
-  UgreenPlayFile? get firstFile => files.firstOrNull;
-
-  int? get duration {
-    int? result;
-    for (final file in files) {
-      final value = file.duration;
-      if (value > 0 && (result == null || value > result)) {
-        result = value;
-      }
-    }
-    return result;
-  }
-
-  String get displayTitle => episode > 0 ? '第$episode集 $title' : title;
 }
 
 class UgreenPlayFile {

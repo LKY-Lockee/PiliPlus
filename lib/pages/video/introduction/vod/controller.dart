@@ -571,7 +571,7 @@ class VodIntroController extends CommonIntroController {
     episodeIndex.value = index;
     detail.refresh();
     videoDetail
-      ..value.title = '${data.video.title} · ${episode.name}'
+      ..value.title = episode.name
       ..refresh();
 
     videoDetailCtr

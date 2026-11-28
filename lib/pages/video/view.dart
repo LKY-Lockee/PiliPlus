@@ -44,7 +44,8 @@ import 'package:PiliPlus/pages/video/introduction/vod/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/vod/view.dart';
 import 'package:PiliPlus/pages/video/member/controller.dart';
 import 'package:PiliPlus/pages/video/member/view.dart';
-import 'package:PiliPlus/pages/video/related/view.dart';
+import 'package:PiliPlus/pages/video/related/bili/view.dart';
+import 'package:PiliPlus/pages/video/related/ugreen/view.dart';
 import 'package:PiliPlus/pages/video/reply/controller.dart';
 import 'package:PiliPlus/pages/video/reply/view.dart';
 import 'package:PiliPlus/pages/video/view_point/view.dart';
@@ -1418,12 +1419,34 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       physics: !needCtr ? platformAlwaysClampingPhysics : null,
       key: const PageStorageKey(CommonIntroController),
       slivers: [
-        SliverPadding(
-          padding: EdgeInsets.only(bottom: padding.bottom + 100),
-          sliver: UgreenIntroPage(
-            key: videoIntroKey,
-            heroTag: heroTag,
-            isPortrait: isPortrait,
+        UgreenIntroPage(
+          key: videoIntroKey,
+          heroTag: heroTag,
+          isPortrait: isPortrait,
+        ),
+        if (videoDetailController.showRelatedVideo) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: Style.safeSpace,
+              ),
+              child: Divider(
+                height: 1,
+                indent: 12,
+                endIndent: 12,
+                color: colorScheme.outline.withValues(alpha: .08),
+              ),
+            ),
+          ),
+          RelatedUgreenPanel(heroTag: heroTag),
+        ],
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height:
+                (videoDetailController.isPlayAll && !isPortrait
+                    ? 80
+                    : Style.safeSpace) +
+                padding.bottom,
           ),
         ),
       ],
@@ -1477,7 +1500,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                 ),
               ),
             ),
-            RelatedVideoPanel(key: videoRelatedKey, heroTag: heroTag),
+            RelatedBiliPanel(key: videoRelatedKey, heroTag: heroTag),
           ],
         ] else
           PgcIntroPage(

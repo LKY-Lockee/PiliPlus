@@ -92,11 +92,10 @@ class _UgreenIntroPageState extends State<UgreenIntroPage> {
       ),
     );
     return SliverPadding(
-      padding: const .fromLTRB(
-        Style.safeSpace,
-        Style.safeSpace,
-        Style.safeSpace,
-        Style.safeSpace + 50,
+      padding: const .only(
+        left: Style.safeSpace,
+        right: Style.safeSpace,
+        top: 10,
       ),
       sliver: sliver,
     );

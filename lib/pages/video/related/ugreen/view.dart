@@ -1,28 +1,30 @@
 import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
-import 'package:PiliPlus/common/widgets/video_card/video_card_h.dart';
 import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/model_hot_video_item.dart';
-import 'package:PiliPlus/pages/video/related/controller.dart';
+import 'package:PiliPlus/models_new/ugreen/related.dart';
+import 'package:PiliPlus/pages/video/introduction/ugreen/controller.dart';
+import 'package:PiliPlus/pages/video/related/ugreen/controller.dart';
+import 'package:PiliPlus/pages/video/related/ugreen/widgets/video_card_h.dart';
 import 'package:PiliPlus/utils/extension/get_ext.dart';
 import 'package:PiliPlus/utils/grid.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
-class RelatedVideoPanel extends StatefulWidget {
-  const RelatedVideoPanel({super.key, required this.heroTag});
+class RelatedUgreenPanel extends StatefulWidget {
+  const RelatedUgreenPanel({super.key, required this.heroTag});
   final String heroTag;
   @override
-  State<RelatedVideoPanel> createState() => _RelatedVideoPanelState();
+  State<RelatedUgreenPanel> createState() => _RelatedUgreenPanelState();
 }
 
-class _RelatedVideoPanelState extends State<RelatedVideoPanel> with GridMixin {
-  late final RelatedController _relatedController;
+class _RelatedUgreenPanelState extends State<RelatedUgreenPanel>
+    with GridMixin {
+  late final RelatedUgreenController _relatedController;
 
   @override
   void initState() {
     super.initState();
     _relatedController = Get.putOrFind(
-      RelatedController.new,
+      RelatedUgreenController.new,
       tag: widget.heroTag,
     );
   }
@@ -35,7 +37,10 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> with GridMixin {
     );
   }
 
-  Widget _buildBody(LoadingState<List<HotVideoItemModel>?> loadingState) {
+  Widget _buildBody(LoadingState<List<UgreenRelatedVideo>?> loadingState) {
+    final introController = Get.find<UgreenIntroController>(
+      tag: widget.heroTag,
+    );
     return switch (loadingState) {
       Loading() => gridSkeleton,
       Success(:final response) =>
@@ -43,11 +48,10 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel> with GridMixin {
             ? SliverGrid.builder(
                 gridDelegate: gridDelegate,
                 itemBuilder: (context, index) {
+                  final item = response[index];
                   return VideoCardH(
-                    videoItem: response[index],
-                    onRemove: () => _relatedController.loadingState
-                      ..value.data!.removeAt(index)
-                      ..refresh(),
+                    videoItem: item,
+                    cover: introController.relatedCoverUrl(item),
                   );
                 },
                 itemCount: response.length,

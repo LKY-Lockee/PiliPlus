@@ -182,9 +182,8 @@ class VideoDetailController extends GetxController
       ? plPlayerController.showVideoReply
       : plPlayerController.showBangumiReply;
 
-  bool get showRelatedVideo => isFileSource || isVod || isUgreen
-      ? false
-      : plPlayerController.showRelatedVideo;
+  bool get showRelatedVideo =>
+      isFileSource || isVod ? false : plPlayerController.showRelatedVideo;
 
   ScrollController? introScrollCtr;
   ScrollController get effectiveIntroScrollCtr =>

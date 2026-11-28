@@ -4,12 +4,14 @@ import 'dart:math';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models_new/ugreen/detail.dart';
 import 'package:PiliPlus/models_new/ugreen/play.dart';
+import 'package:PiliPlus/models_new/ugreen/related.dart';
 import 'package:PiliPlus/models_new/ugreen/transcode.dart';
 import 'package:PiliPlus/models_new/video/video_detail/episode.dart';
 import 'package:PiliPlus/models_new/video/video_detail/stat_detail.dart';
 import 'package:PiliPlus/pages/common/common_intro_controller.dart';
 import 'package:PiliPlus/pages/episode_panel/ugreen/view.dart';
 import 'package:PiliPlus/pages/video/introduction/ugreen/widgets/intro_detail.dart';
+import 'package:PiliPlus/pages/video/related/ugreen/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/ugreen/http/ugreen_endpoint.dart';
 import 'package:PiliPlus/plugin/ugreen/http/ugreen_fav.dart';
@@ -111,7 +113,7 @@ class UgreenIntroController extends CommonIntroController {
     if (index >= 0 && index < episode.files.length) {
       return episode.files[index];
     }
-    return episode.firstFile;
+    return episode.files.firstOrNull;
   }
 
   UgreenTranscodableResolution? get currentQuality {
@@ -156,6 +158,20 @@ class UgreenIntroController extends CommonIntroController {
           ? video.value?.categoryId
           : categoryId,
       posterPath: episode.coverPath,
+    );
+    return url.isNotEmpty ? url : coverUrl;
+  }
+
+  String relatedCoverUrl(UgreenRelatedVideo item) {
+    final current = service.session.value;
+    if (current == null) {
+      return '';
+    }
+    final categoryId = item.categoryId;
+    final url = UgreenMediaHttp.coverUrl(
+      current,
+      categoryId: categoryId.isEmpty ? video.value?.categoryId : categoryId,
+      posterPath: item.coverPath,
     );
     return url.isNotEmpty ? url : coverUrl;
   }
@@ -424,6 +440,12 @@ class UgreenIntroController extends CommonIntroController {
         return false;
       }
       _ugVideoInfoId = target.ugVideoInfoId;
+      if (Get.isRegistered<RelatedUgreenController>(tag: heroTag)) {
+        Get.find<RelatedUgreenController>(tag: heroTag)
+          ..supersedePendingRequests()
+          ..ugVideoInfoId = target.ugVideoInfoId
+          ..onReload();
+      }
       _initialEpisodeId = null;
       _initialEpisode = null;
       _initialFilePath = '';
@@ -743,7 +765,7 @@ class UgreenIntroController extends CommonIntroController {
     final episode = currentEpisode;
     if (data != null) {
       videoDetail.value.title = isTv && episode != null
-          ? '${data.name} · ${episode.displayTitle}'
+          ? episode.title
           : data.name;
       videoDetail.refresh();
     }

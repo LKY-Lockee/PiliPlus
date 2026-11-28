@@ -1,5 +1,6 @@
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models_new/ugreen/detail.dart';
+import 'package:PiliPlus/models_new/ugreen/related.dart';
 import 'package:PiliPlus/models_new/ugreen/session.dart';
 import 'package:PiliPlus/models_new/ugreen/transcode.dart';
 import 'package:PiliPlus/plugin/ugreen/http/ugreen_api.dart';
@@ -50,6 +51,43 @@ abstract final class UgreenVideoHttp {
     }
     try {
       return Success(UgreenTvDetail.fromJson(_data(res.response)));
+    } catch (e) {
+      return Error('解析失败: $e');
+    }
+  }
+
+  static Future<LoadingState<List<UgreenRelatedVideo>>> relatedRecommendation(
+    UgreenSession session, {
+    required int ugVideoInfoId,
+  }) async {
+    final res = await UgreenEndpoint.request(
+      session,
+      UgreenApi.videoRelatedRecommendation,
+      query: {'ug_video_info_id': ugVideoInfoId},
+    );
+    if (res is Error) {
+      return res;
+    }
+    if (res is! Success<Map<String, dynamic>>) {
+      return const Error('加载失败');
+    }
+    final data = res.response['data'];
+    if (data is! Map) {
+      return const Error('加载失败');
+    }
+    try {
+      final items = data['related_recommendation_arr'];
+      if (items is! List) {
+        return const Success([]);
+      }
+      return Success(
+        items
+            .whereType<Map>()
+            .map(
+              (e) => UgreenRelatedVideo.fromJson(e.cast<String, dynamic>()),
+            )
+            .toList(),
+      );
     } catch (e) {
       return Error('解析失败: $e');
     }
