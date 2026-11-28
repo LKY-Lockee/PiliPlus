@@ -144,6 +144,22 @@ class UgreenIntroController extends CommonIntroController {
     );
   }
 
+  String episodeCoverUrl(UgreenPlayEpisode episode) {
+    final current = service.session.value;
+    if (current == null) {
+      return '';
+    }
+    final categoryId = episode.categoryId;
+    final url = UgreenMediaHttp.coverUrl(
+      current,
+      categoryId: categoryId == null || categoryId.isEmpty
+          ? video.value?.categoryId
+          : categoryId,
+      posterPath: episode.coverPath,
+    );
+    return url.isNotEmpty ? url : coverUrl;
+  }
+
   Duration get _duration {
     final info = transcode.value;
     if (info != null && info.duration > 0) {

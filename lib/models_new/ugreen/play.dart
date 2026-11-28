@@ -8,6 +8,7 @@ class UgreenPlayEpisode {
   final String? overview;
   final int? ugTelevisionEpisodeId;
   final String? categoryId;
+  final String? coverPath;
   final List<UgreenPlayFile> files;
 
   const UgreenPlayEpisode({
@@ -17,6 +18,7 @@ class UgreenPlayEpisode {
     this.overview,
     this.ugTelevisionEpisodeId,
     this.categoryId,
+    this.coverPath,
     required this.files,
   });
 
@@ -28,6 +30,7 @@ class UgreenPlayEpisode {
       overview: item.overview,
       ugTelevisionEpisodeId: item.ugTelevisionEpisodeId,
       categoryId: item.categoryId,
+      coverPath: item.coverPath,
       files: item.fileInfo
           .map(
             (file) => UgreenPlayFile(
@@ -52,6 +55,8 @@ class UgreenPlayEpisode {
       episode: 0,
       title: info.name,
       overview: info.introduction,
+      categoryId: info.categoryId,
+      coverPath: info.posterPath,
       files: info.filePath
           .map(
             (path) => UgreenPlayFile(
@@ -70,6 +75,17 @@ class UgreenPlayEpisode {
   }
 
   UgreenPlayFile? get firstFile => files.firstOrNull;
+
+  int? get duration {
+    int? result;
+    for (final file in files) {
+      final value = file.duration;
+      if (value > 0 && (result == null || value > result)) {
+        result = value;
+      }
+    }
+    return result;
+  }
 
   String get displayTitle => episode > 0 ? '第$episode集 $title' : title;
 }
